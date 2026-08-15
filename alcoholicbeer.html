@@ -1,0 +1,1831 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover"/>
+<title>Pinoy Fries</title>
+<link rel="icon" href="logo.png" type="image/png"/>
+<script src="https://cdn.tailwindcss.com"></script>
+<link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet"/>
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<script>
+  // Load supabase-config.js defensively: a 404 or CDN hiccup must never blank the page.
+  (function(){
+    var el = document.createElement('script');
+    el.src = 'supabase-config.js';
+    el.async = false;
+    el.onerror = function(){ console.warn('supabase-config.js failed to load - running in offline mode.'); };
+    document.head.appendChild(el);
+  })();
+</script>
+<link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=Caveat:wght@600;700&display=swap" rel="stylesheet"/>
+
+<style>
+* {
+    -webkit-tap-highlight-color: transparent;
+    box-sizing: border-box;
+}
+
+body {
+    background-image: url('https://images.stockcake.com/public/5/4/e/54e3ae37-1cda-4699-a981-72003473025c/crispy-golden-fries-stockcake.jpg');
+    background-size: cover;
+    background-position: center;
+    background-attachment: fixed;
+    font-family: 'Plus Jakarta Sans', sans-serif;
+    position: relative;
+    color: #f8fafc;
+    min-height: 100vh;
+    padding-bottom: 85px;
+    overflow-x: hidden;
+}
+
+/* Atmospheric Ambient Dark Gradient */
+body::before {
+    content: '';
+    position: fixed;
+    inset: 0;
+    background: radial-gradient(circle at 50% 20%, rgba(20, 15, 10, 0.75), rgba(8, 8, 12, 0.94));
+    z-index: -1;
+}
+
+/* Film grain overlay */
+body::after {
+    content: "";
+    position: fixed;
+    inset: 0;
+    z-index: 500;
+    pointer-events: none;
+    opacity: .04;
+    mix-blend-mode: overlay;
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='120' height='120'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='2' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
+}
+
+/* Ambient floating orbs */
+.orb {
+    position: fixed;
+    border-radius: 50%;
+    filter: blur(70px);
+    z-index: -1;
+    pointer-events: none;
+    opacity: 0.35;
+}
+.orb-1 {
+    width: 380px; height: 380px;
+    background: radial-gradient(circle, #FF9F1C, transparent 70%);
+    top: -100px; left: -100px;
+    animation: floatOrb 22s ease-in-out infinite;
+}
+.orb-2 {
+    width: 420px; height: 420px;
+    background: radial-gradient(circle, #FF5400, transparent 70%);
+    bottom: -140px; right: -140px;
+    animation: floatOrb 26s ease-in-out infinite reverse;
+}
+@keyframes floatOrb {
+    0%,100% { transform: translate(0,0) scale(1); }
+    33% { transform: translate(50px, 70px) scale(1.1); }
+    66% { transform: translate(-40px, 50px) scale(0.95); }
+}
+
+/* Falling fries ambient */
+.falling-fry {
+    position: fixed;
+    top: -60px;
+    color: rgba(255, 159, 28, 0.14);
+    animation: fallDown linear infinite;
+    z-index: -1;
+    pointer-events: none;
+    filter: drop-shadow(0 0 10px rgba(255,159,28,0.3));
+}
+@keyframes fallDown {
+    to { transform: translateY(110vh) rotate(720deg); }
+}
+
+/* Glassmorphism Header Bar */
+.navbar {
+    position: sticky;
+    top: 0;
+    z-index: 100;
+    background: rgba(15, 15, 20, 0.82);
+    backdrop-filter: blur(20px);
+    -webkit-backdrop-filter: blur(20px);
+    border-bottom: 1px solid rgba(255, 159, 28, 0.25);
+    box-shadow: 0 10px 35px rgba(0, 0, 0, 0.6);
+    transform: translateY(-100%);
+    animation: dropIn 0.7s cubic-bezier(0.2, 0.9, 0.3, 1.1) forwards;
+}
+@keyframes dropIn { to { transform: translateY(0); } }
+
+/* Animated top border line */
+.navbar::after {
+    content: '';
+    position: absolute;
+    bottom: -1px;
+    left: 0;
+    height: 1px;
+    width: 100%;
+    background: linear-gradient(90deg, transparent, #FF9F1C 30%, #FF5400 50%, #FF9F1C 70%, transparent);
+    background-size: 200% 100%;
+    animation: shimmerLine 4s linear infinite;
+    opacity: 0.7;
+}
+@keyframes shimmerLine { to { background-position: -200% 0; } }
+
+.navbar-content {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 0.75rem 1rem;
+    max-width: 1280px;
+    margin: 0 auto;
+}
+
+/* Brand lockup. The icon and the wordmark are styled SEPARATELY:
+   a gradient text-clip must never wrap the icon, and text-shadow must never
+   sit under transparent text (that halo is what made the logo look blurry). */
+.navbar-brand {
+    display: flex;
+    align-items: center;
+    gap: 0.55rem;
+    font-size: 1.3rem;
+    font-weight: 800;
+    letter-spacing: -0.5px;
+    color: #FFB627;
+    animation: brandSlideIn 0.55s ease-out both;
+    transition: transform 0.25s ease;
+}
+.navbar-brand:hover { transform: scale(1.03); }
+
+/* The flame: solid colour, crisp edges, no animated filter. */
+.navbar-brand i {
+    display: inline-block;
+    color: #FF9F1C;
+    font-size: 1.15rem;
+    line-height: 1;
+    /* a single static shadow — cheap, and it does not smear */
+    filter: drop-shadow(0 0 5px rgba(255, 159, 28, 0.55));
+    animation: flameFlicker 1.6s ease-in-out infinite;
+    /* render the glyph on its own layer at full device resolution */
+    transform: translateZ(0);
+    backface-visibility: hidden;
+}
+
+/* The wordmark: gradient clip lives HERE only, with NO text-shadow. */
+.navbar-brand span {
+    background: linear-gradient(135deg, #FFE066 0%, #FF9F1C 55%, #FF7A00 100%);
+    -webkit-background-clip: text;
+    background-clip: text;
+    -webkit-text-fill-color: transparent;
+    color: #FFB627;                 /* fallback if clip unsupported */
+    /* keeps the gradient text sharp instead of resampled/fuzzy */
+    -webkit-font-smoothing: antialiased;
+    text-rendering: optimizeLegibility;
+}
+/* Opacity-only flicker: no scale (which resampled the glyph and blurred it)
+   and no animated filter (which forced a repaint every single frame). */
+@keyframes flameFlicker {
+    0%, 100% { opacity: 1; }
+    50%      { opacity: 0.72; }
+}
+@keyframes brandSlideIn {
+    from { opacity: 0; transform: translateX(-20px); }
+    to { opacity: 1; transform: translateX(0); }
+}
+/* brandShimmer removed: repainting gradient-clipped text every frame was
+   both a performance cost and a source of visible shimmer/blur. */
+
+/* Header Buttons */
+.nav-btn {
+    background: rgba(255, 255, 255, 0.08);
+    border: 1px solid rgba(255, 255, 255, 0.15);
+    color: #f1f5f9;
+    padding: 0.55rem 0.9rem;
+    border-radius: 14px;
+    font-weight: 600;
+    font-size: 0.82rem;
+    display: inline-flex;
+    align-items: center;
+    gap: 0.4rem;
+    transition: all 0.3s cubic-bezier(0.34, 1.56, 0.64, 1);
+    cursor: pointer;
+    opacity: 0;
+    animation: navBtnIn 0.5s ease-out forwards;
+}
+.nav-btn:nth-child(1) { animation-delay: 0.4s; }
+.nav-btn:nth-child(2) { animation-delay: 0.5s; }
+@keyframes navBtnIn {
+    from { opacity: 0; transform: translateY(-10px); }
+    to { opacity: 1; transform: translateY(0); }
+}
+.nav-btn:hover {
+    background: rgba(255, 159, 28, 0.25);
+    border-color: rgba(255, 159, 28, 0.6);
+    color: #FF9F1C;
+    transform: translateY(-2px);
+    box-shadow: 0 6px 18px rgba(255, 159, 28, 0.25);
+}
+.nav-btn i { transition: transform 0.3s ease; }
+.nav-btn:hover i { transform: rotate(-8deg) scale(1.15); }
+
+.cart-action-btn {
+    background: linear-gradient(135deg, #FF9F1C, #FF5400);
+    color: #ffffff;
+    border: none;
+    padding: 0.55rem 1rem;
+    border-radius: 14px;
+    font-weight: 700;
+    font-size: 0.85rem;
+    display: inline-flex;
+    align-items: center;
+    gap: 0.5rem;
+    position: relative;
+    overflow: hidden;
+    box-shadow: 0 6px 20px rgba(255, 84, 0, 0.4);
+    transition: all 0.3s cubic-bezier(0.34, 1.56, 0.64, 1);
+    opacity: 0;
+    animation: navBtnIn 0.5s ease-out 0.6s forwards;
+}
+.cart-action-btn::before {
+    content: '';
+    position: absolute;
+    top: 0; left: -100%;
+    width: 60%; height: 100%;
+    background: linear-gradient(120deg, transparent, rgba(255,255,255,0.4), transparent);
+    transform: skewX(-20deg);
+    animation: btnSweep 3.5s ease-in-out infinite;
+}
+@keyframes btnSweep {
+    0%, 65% { left: -100%; }
+    100% { left: 150%; }
+}
+.cart-action-btn:hover {
+    transform: translateY(-2px) scale(1.03);
+    box-shadow: 0 10px 26px rgba(255, 84, 0, 0.55);
+}
+.cart-action-btn:active { transform: scale(0.94); }
+
+.cart-notification {
+    position: absolute;
+    top: -6px;
+    right: -6px;
+    background: #EF4444;
+    color: white;
+    border-radius: 999px;
+    min-width: 20px;
+    height: 20px;
+    padding: 0 5px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 0.68rem;
+    font-weight: 800;
+    box-shadow: 0 3px 10px rgba(239, 68, 68, 0.6);
+    border: 2px solid #0f0f14;
+    transform: scale(0);
+    transition: transform 0.35s cubic-bezier(0.34, 1.56, 0.64, 1);
+    z-index: 2;
+}
+
+.cart-notification.show {
+    transform: scale(1);
+    animation: pulseRing 2s ease-in-out infinite 0.5s;
+}
+
+@keyframes pulseRing {
+    0%,100% { box-shadow: 0 3px 10px rgba(239, 68, 68, 0.6), 0 0 0 0 rgba(239, 68, 68, 0.5); }
+    50% { box-shadow: 0 3px 10px rgba(239, 68, 68, 0.6), 0 0 0 6px rgba(239, 68, 68, 0); }
+}
+
+.bounce-anim {
+    animation: bouncePop 0.55s cubic-bezier(0.34, 1.56, 0.64, 1);
+}
+
+@keyframes bouncePop {
+    0% { transform: scale(1); }
+    35% { transform: scale(1.22) rotate(-3deg); }
+    70% { transform: scale(0.94) rotate(2deg); }
+    100% { transform: scale(1) rotate(0); }
+}
+
+/* Category Filter Bar */
+.filter-scroll {
+    display: flex;
+    gap: 0.5rem;
+    overflow-x: auto;
+    padding: 0.4rem 1rem 0.75rem 1rem;
+    scrollbar-width: none;
+}
+.filter-scroll::-webkit-scrollbar { display: none; }
+
+.filter-chip {
+    white-space: nowrap;
+    padding: 0.4rem 0.95rem;
+    border-radius: 99px;
+    background: rgba(255, 255, 255, 0.06);
+    border: 1px solid rgba(255, 255, 255, 0.12);
+    color: #cbd5e1;
+    font-size: 0.75rem;
+    font-weight: 600;
+    transition: all 0.3s cubic-bezier(0.34, 1.56, 0.64, 1);
+    cursor: pointer;
+    opacity: 0;
+    transform: translateY(-8px);
+    animation: chipIn 0.5s ease-out forwards;
+}
+.filter-chip:nth-child(1) { animation-delay: 0.55s; }
+.filter-chip:nth-child(2) { animation-delay: 0.65s; }
+.filter-chip:nth-child(3) { animation-delay: 0.75s; }
+.filter-chip:nth-child(4) { animation-delay: 0.85s; }
+@keyframes chipIn {
+    to { opacity: 1; transform: translateY(0); }
+}
+.filter-chip:hover {
+    background: rgba(255, 159, 28, 0.15);
+    border-color: rgba(255, 159, 28, 0.4);
+    color: #fff;
+    transform: translateY(-2px);
+}
+
+.filter-chip.active {
+    background: linear-gradient(135deg, #FF9F1C, #FF5400);
+    color: white;
+    border-color: transparent;
+    box-shadow: 0 6px 18px rgba(255, 84, 0, 0.5);
+    transform: translateY(-1px) scale(1.02);
+}
+
+/* Mobile Bottom Action Dock */
+.mobile-bottom-bar {
+    display: none;
+    position: fixed;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    height: 65px;
+    background: rgba(15, 15, 20, 0.88);
+    backdrop-filter: blur(20px);
+    -webkit-backdrop-filter: blur(20px);
+    border-top: 1px solid rgba(255, 255, 255, 0.12);
+    z-index: 90;
+    padding: 0 1.25rem;
+    transform: translateY(100%);
+    animation: dockUp 0.6s cubic-bezier(0.2, 0.9, 0.3, 1.1) 0.4s forwards;
+}
+@keyframes dockUp { to { transform: translateY(0); } }
+
+@media (max-width: 640px) {
+    .mobile-bottom-bar {
+        display: flex;
+        justify-content: space-around;
+        align-items: center;
+    }
+}
+
+.mobile-bottom-btn {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 3px;
+    color: #94a3b8;
+    font-size: 0.68rem;
+    font-weight: 600;
+    background: none;
+    border: none;
+    transition: all 0.25s ease;
+    position: relative;
+    padding: 4px 8px;
+}
+.mobile-bottom-btn i { transition: transform 0.3s cubic-bezier(0.34, 1.56, 0.64, 1); }
+.mobile-bottom-btn:hover i, .mobile-bottom-btn.active i {
+    transform: translateY(-3px) scale(1.15);
+}
+.mobile-bottom-btn.active, .mobile-bottom-btn:hover {
+    color: #FF9F1C;
+}
+.mobile-bottom-btn.active::before {
+    content: '';
+    position: absolute;
+    top: -1px;
+    left: 50%;
+    transform: translateX(-50%);
+    width: 30px;
+    height: 3px;
+    background: linear-gradient(90deg, #FF9F1C, #FF5400);
+    border-radius: 0 0 3px 3px;
+    box-shadow: 0 0 10px rgba(255,159,28,0.6);
+}
+
+/* Hero section heading */
+.hero-section {
+    opacity: 0;
+    transform: translateY(20px);
+    animation: heroIn 0.7s cubic-bezier(0.2, 0.7, 0.2, 1) 0.4s forwards;
+}
+@keyframes heroIn {
+    to { opacity: 1; transform: translateY(0); }
+}
+.hero-title {
+    background: linear-gradient(90deg, #ffffff 0%, #FFE066 45%, #ffffff 55%, #ffffff 100%);
+    background-size: 200% auto;
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+    animation: shimmerText 5s linear infinite;
+}
+@keyframes shimmerText { to { background-position: -200% center; } }
+
+.hero-badge {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    padding: 4px 12px;
+    background: rgba(255, 159, 28, 0.12);
+    border: 1px solid rgba(255, 159, 28, 0.3);
+    border-radius: 99px;
+    font-size: 0.68rem;
+    font-weight: 700;
+    letter-spacing: 1.5px;
+    color: #FF9F1C;
+    text-transform: uppercase;
+    margin-bottom: 8px;
+    animation: badgePulse 2.5s ease-in-out infinite;
+}
+@keyframes badgePulse {
+    0%,100% { box-shadow: 0 0 0 0 rgba(255,159,28,0.4); }
+    50% { box-shadow: 0 0 0 8px rgba(255,159,28,0); }
+}
+.hero-badge .dot {
+    width: 6px; height: 6px; border-radius: 50%;
+    background: #FF9F1C;
+    box-shadow: 0 0 8px #FF9F1C;
+    animation: dotBlink 1.5s ease-in-out infinite;
+}
+@keyframes dotBlink { 50% { opacity: 0.3; } }
+
+.hand-note {
+    font-family: 'Caveat', cursive;
+    color: #FFE066;
+    font-size: 1.05rem;
+    font-weight: 700;
+    display: inline-block;
+    transform: rotate(-2deg);
+    margin-top: 6px;
+}
+
+/* Product Glass Cards */
+.product-card {
+    background: rgba(24, 24, 32, 0.72);
+    backdrop-filter: blur(20px);
+    -webkit-backdrop-filter: blur(20px);
+    border: 1px solid rgba(255, 255, 255, 0.12);
+    border-radius: 20px;
+    padding: 0.85rem;
+    position: relative;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.4);
+    transition: all 0.4s cubic-bezier(0.25, 0.8, 0.25, 1);
+    overflow: hidden;
+}
+
+.product-card::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    border-radius: 20px;
+    padding: 1px;
+    background: linear-gradient(135deg, rgba(255, 159, 28, 0.35), transparent 40%, transparent 60%, rgba(255, 84, 0, 0.3));
+    -webkit-mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
+    mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
+    -webkit-mask-composite: xor;
+    mask-composite: exclude;
+    pointer-events: none;
+    opacity: 0.6;
+    transition: opacity 0.4s ease;
+}
+
+.product-card::after {
+    content: '';
+    position: absolute;
+    top: -50%;
+    left: -50%;
+    width: 60%;
+    height: 200%;
+    background: linear-gradient(115deg, transparent, rgba(255,255,255,0.06), transparent);
+    transform: rotate(25deg);
+    transition: transform 0.8s ease;
+    pointer-events: none;
+    opacity: 0;
+}
+
+.product-card:hover {
+    transform: translateY(-6px) scale(1.01);
+    box-shadow: 0 22px 45px rgba(255, 159, 28, 0.28), 0 0 0 1px rgba(255,159,28,0.15) inset;
+    border-color: rgba(255, 159, 28, 0.3);
+}
+.product-card:hover::before { opacity: 1; }
+.product-card:hover::after {
+    opacity: 1;
+    transform: rotate(25deg) translateX(180%);
+}
+
+/* Card entrance animation (CSS-native fallback, works even if ScrollReveal fails to load) */
+.product-card {
+    opacity: 0;
+    animation: cardIn 0.6s cubic-bezier(0.22, 1, 0.36, 1) forwards;
+    animation-delay: calc(var(--i, 0) * 55ms);
+}
+@keyframes cardIn {
+    from { opacity: 0; transform: translateY(26px) scale(0.95); }
+    to { opacity: 1; transform: translateY(0) scale(1); }
+}
+
+/* Status Badges */
+.badge-tag {
+    position: absolute;
+    top: 10px;
+    z-index: 10;
+    padding: 0.28rem 0.65rem;
+    border-radius: 8px;
+    font-size: 0.62rem;
+    font-weight: 800;
+    letter-spacing: 0.5px;
+    text-transform: uppercase;
+    backdrop-filter: blur(6px);
+}
+
+.best-seller-badge {
+    left: 10px;
+    background: linear-gradient(135deg, #FFE066, #FF9F1C);
+    color: #000;
+    box-shadow: 0 4px 12px rgba(255, 159, 28, 0.4);
+    animation: bestPulse 2.2s ease-in-out infinite;
+}
+@keyframes bestPulse {
+    0%,100% { box-shadow: 0 4px 12px rgba(255,159,28,0.4); transform: scale(1); }
+    50% { box-shadow: 0 4px 20px rgba(255,159,28,0.7); transform: scale(1.04); }
+}
+.best-seller-badge i { animation: flameFlicker 1.2s ease-in-out infinite; }
+
+.stock-badge {
+    right: 10px;
+}
+
+.stock-badge.in-stock { background: rgba(34, 197, 94, 0.22); color: #4ade80; border: 1px solid rgba(74, 222, 128, 0.35); }
+.stock-badge.low-stock {
+    background: rgba(245, 158, 11, 0.22); color: #fbbf24; border: 1px solid rgba(251, 191, 36, 0.35);
+    animation: lowBlink 1.6s ease-in-out infinite;
+}
+@keyframes lowBlink {
+    0%,100% { box-shadow: 0 0 0 0 rgba(251,191,36,0); }
+    50% { box-shadow: 0 0 12px rgba(251,191,36,0.5); }
+}
+.stock-badge.out-stock { background: rgba(239, 68, 68, 0.22); color: #f87171; border: 1px solid rgba(248, 113, 113, 0.35); }
+
+/* Card Image Box */
+.product-image-container {
+    width: 100%;
+    height: 145px;
+    border-radius: 14px;
+    overflow: hidden;
+    position: relative;
+    background: radial-gradient(circle at center, rgba(35, 35, 48, 0.8), rgba(15, 15, 22, 0.95));
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 8px;
+    cursor: pointer;
+}
+.product-image-container::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background: radial-gradient(circle at 30% 30%, rgba(255,159,28,0.15), transparent 60%);
+    opacity: 0;
+    transition: opacity 0.4s ease;
+}
+.product-card:hover .product-image-container::before { opacity: 1; }
+
+/* Steam wisps rising off the fries on hover */
+.steam-wisp {
+    position: absolute;
+    bottom: 18%;
+    width: 10px;
+    height: 26px;
+    border-radius: 50%;
+    background: linear-gradient(to top, rgba(255,255,255,0.5), transparent 75%);
+    filter: blur(3px);
+    opacity: 0;
+    pointer-events: none;
+}
+.steam-wisp.s1 { left: 38%; }
+.steam-wisp.s2 { left: 50%; }
+.steam-wisp.s3 { left: 62%; }
+.product-card:hover .steam-wisp {
+    animation: steamRise 1.8s ease-in infinite;
+}
+.product-card:hover .steam-wisp.s2 { animation-delay: 0.3s; }
+.product-card:hover .steam-wisp.s3 { animation-delay: 0.6s; }
+@keyframes steamRise {
+    0% { opacity: 0; transform: translateY(0) scaleX(1); }
+    25% { opacity: 0.5; }
+    100% { opacity: 0; transform: translateY(-48px) scaleX(1.6); }
+}
+
+.product-image {
+    max-width: 100%;
+    max-height: 100%;
+    width: auto;
+    height: auto;
+    object-fit: contain;
+    transition: transform 0.5s cubic-bezier(0.34, 1.56, 0.64, 1);
+    filter: drop-shadow(0 8px 12px rgba(0,0,0,0.5));
+    position: relative;
+    z-index: 1;
+}
+
+.product-card:hover .product-image {
+    transform: scale(1.12) rotate(2deg) translateY(-4px);
+    filter: drop-shadow(0 14px 20px rgba(255,159,28,0.35));
+}
+
+.zoom-overlay {
+    position: absolute;
+    bottom: 6px;
+    right: 6px;
+    background: rgba(0, 0, 0, 0.6);
+    backdrop-filter: blur(4px);
+    width: 24px;
+    height: 24px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: #94a3b8;
+    font-size: 0.65rem;
+    opacity: 0.7;
+    transition: all 0.3s ease;
+    z-index: 2;
+}
+.product-card:hover .zoom-overlay {
+    opacity: 1;
+    background: rgba(255, 159, 28, 0.85);
+    color: #000;
+    transform: scale(1.15);
+}
+
+.product-card.sold-out {
+    opacity: 0.65;
+}
+
+.product-card.sold-out .product-image {
+    filter: grayscale(0.85);
+}
+
+/* Quantity Controls */
+.quantity-selector {
+    display: inline-flex;
+    align-items: center;
+    background: rgba(12, 12, 18, 0.6);
+    border: 1px solid rgba(255, 255, 255, 0.15);
+    border-radius: 10px;
+    padding: 2px;
+    transition: border-color 0.3s ease;
+}
+.product-card:hover .quantity-selector { border-color: rgba(255,159,28,0.3); }
+
+.quantity-btn {
+    width: 28px;
+    height: 28px;
+    border-radius: 8px;
+    background: rgba(255, 255, 255, 0.08);
+    color: white;
+    border: none;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    transition: all 0.25s cubic-bezier(0.34, 1.56, 0.64, 1);
+}
+
+.quantity-btn:hover:not(:disabled) {
+    background: #FF9F1C;
+    color: black;
+    transform: scale(1.1);
+}
+.quantity-btn:active:not(:disabled) { transform: scale(0.9); }
+
+.quantity-btn:disabled {
+    opacity: 0.3;
+    cursor: not-allowed;
+}
+
+.quantity-display {
+    width: 26px;
+    text-align: center;
+    font-weight: 700;
+    font-size: 0.85rem;
+    transition: transform 0.2s ease;
+}
+.quantity-display.bump { animation: bumpNum 0.35s ease; }
+@keyframes bumpNum {
+    50% { transform: scale(1.3); color: #FF9F1C; }
+}
+
+/* Add to Cart Button */
+.add-to-cart-btn {
+    flex: 1;
+    background: linear-gradient(135deg, #FF9F1C, #FF5400);
+    color: white;
+    border: none;
+    padding: 0.6rem 0.5rem;
+    border-radius: 10px;
+    font-weight: 700;
+    font-size: 0.78rem;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0.35rem;
+    box-shadow: 0 4px 14px rgba(255, 84, 0, 0.3);
+    transition: all 0.3s cubic-bezier(0.34, 1.56, 0.64, 1);
+    position: relative;
+    overflow: hidden;
+}
+.add-to-cart-btn::before {
+    content: '';
+    position: absolute;
+    top: 0; left: -100%;
+    width: 60%; height: 100%;
+    background: linear-gradient(120deg, transparent, rgba(255,255,255,0.35), transparent);
+    transform: skewX(-20deg);
+    transition: left 0.6s ease;
+}
+.add-to-cart-btn:hover:not(:disabled)::before { left: 150%; }
+
+.add-to-cart-btn:hover:not(:disabled) {
+    box-shadow: 0 8px 22px rgba(255, 84, 0, 0.55);
+    transform: translateY(-2px);
+}
+
+.add-to-cart-btn:active:not(:disabled) {
+    transform: scale(0.95);
+}
+
+.add-to-cart-btn:disabled {
+    background: rgba(255, 255, 255, 0.1);
+    color: #64748b;
+    box-shadow: none;
+    cursor: not-allowed;
+}
+
+.add-to-cart-btn.added {
+    animation: addedPop 0.5s cubic-bezier(0.34, 1.56, 0.64, 1);
+}
+@keyframes addedPop {
+    0% { transform: scale(1); }
+    40% { transform: scale(0.9); }
+    70% { transform: scale(1.08); }
+    100% { transform: scale(1); }
+}
+
+/* Price with gradient */
+.price-tag {
+    background: linear-gradient(135deg, #FFE066, #FF9F1C);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+}
+
+/* Rating Stars */
+.star-rating i {
+    color: #FFE066;
+    font-size: 0.72rem;
+    transition: transform 0.3s ease;
+}
+.product-card:hover .star-rating i { animation: starTwinkle 0.6s ease; }
+.product-card:hover .star-rating i:nth-child(1) { animation-delay: 0s; }
+.product-card:hover .star-rating i:nth-child(2) { animation-delay: 0.05s; }
+.product-card:hover .star-rating i:nth-child(3) { animation-delay: 0.1s; }
+.product-card:hover .star-rating i:nth-child(4) { animation-delay: 0.15s; }
+.product-card:hover .star-rating i:nth-child(5) { animation-delay: 0.2s; }
+@keyframes starTwinkle {
+    50% { transform: scale(1.3) rotate(15deg); filter: drop-shadow(0 0 6px #FFE066); }
+}
+
+/* Skeleton loading */
+.skeleton-card {
+    background: rgba(24, 24, 32, 0.7);
+    border: 1px solid rgba(255, 255, 255, 0.08);
+    border-radius: 20px;
+    padding: 0.85rem;
+    height: 280px;
+    position: relative;
+    overflow: hidden;
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+}
+.skeleton-card::after {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background: linear-gradient(90deg, transparent, rgba(255,255,255,0.06), transparent);
+    animation: skeletonPulse 1.5s ease-in-out infinite;
+}
+.skeleton-block {
+    background: rgba(255,255,255,0.05);
+    border-radius: 10px;
+}
+.skeleton-block.img { height: 145px; border-radius: 14px; }
+.skeleton-block.line { height: 12px; width: 70%; }
+.skeleton-block.line.short { width: 45%; }
+@keyframes skeletonPulse {
+    0% { transform: translateX(-100%); }
+    100% { transform: translateX(100%); }
+}
+
+/* Modal Popup */
+.modal {
+    display: none;
+    position: fixed;
+    inset: 0;
+    z-index: 1000;
+    background: rgba(0, 0, 0, 0.85);
+    backdrop-filter: blur(14px);
+    justify-content: center;
+    align-items: center;
+    padding: 1rem;
+    opacity: 0;
+    transition: opacity 0.3s ease;
+}
+
+.modal.show {
+    display: flex;
+    opacity: 1;
+}
+
+.modal-content-card {
+    background: rgba(22, 22, 30, 0.95);
+    border: 1px solid rgba(255, 255, 255, 0.15);
+    border-radius: 24px;
+    max-width: 440px;
+    width: 100%;
+    overflow: hidden;
+    box-shadow: 0 25px 60px rgba(0, 0, 0, 0.7), 0 0 0 1px rgba(255,159,28,0.1) inset;
+    transform: scale(0.85) translateY(30px);
+    opacity: 0;
+    transition: all 0.45s cubic-bezier(0.34, 1.56, 0.64, 1);
+}
+.modal.show .modal-content-card {
+    transform: scale(1) translateY(0);
+    opacity: 1;
+}
+.modal.show #modalImg {
+    animation: modalImgIn 0.6s cubic-bezier(0.34, 1.56, 0.64, 1) 0.15s backwards;
+}
+@keyframes modalImgIn {
+    from { opacity: 0; transform: scale(0.7) rotate(-8deg); }
+    to { opacity: 1; transform: scale(1) rotate(0); }
+}
+
+/* Floating Toast Notification */
+#notification-container {
+    position: fixed;
+    top: 1rem;
+    right: 1rem;
+    z-index: 1100;
+    display: flex;
+    flex-direction: column;
+    gap: 0.5rem;
+    max-width: 90vw;
+    width: 320px;
+}
+
+.toast {
+    background: rgba(18, 18, 26, 0.94);
+    border-left: 4px solid #10B981;
+    backdrop-filter: blur(16px);
+    color: white;
+    padding: 0.85rem 1rem;
+    border-radius: 12px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    font-size: 0.82rem;
+    transform: translateX(120%);
+    transition: all 0.4s cubic-bezier(0.34, 1.56, 0.64, 1);
+    box-shadow: 0 10px 30px rgba(0,0,0,0.5);
+    position: relative;
+    overflow: hidden;
+}
+.toast::after {
+    content: '';
+    position: absolute;
+    bottom: 0; left: 0;
+    height: 2px;
+    width: 100%;
+    background: linear-gradient(90deg, #10B981, #34D399);
+    transform-origin: right;
+    animation: toastProgress 3.5s linear forwards;
+}
+.toast.error::after { background: linear-gradient(90deg, #EF4444, #F87171); }
+@keyframes toastProgress {
+    from { transform: scaleX(1); }
+    to { transform: scaleX(0); }
+}
+
+.toast.show { transform: translateX(0); }
+.toast.error { border-left-color: #EF4444; }
+
+/* Confetti */
+.confetti-piece {
+    position: fixed;
+    width: 8px;
+    height: 8px;
+    pointer-events: none;
+    z-index: 1200;
+    border-radius: 2px;
+}
+
+/* Empty state */
+.empty-state-icon {
+    animation: emptyIn 0.5s cubic-bezier(0.34, 1.56, 0.64, 1);
+}
+@keyframes emptyIn {
+    from { opacity: 0; transform: scale(0.5) rotate(-15deg); }
+    to { opacity: 1; transform: scale(1) rotate(0); }
+}
+
+/* Visible keyboard focus for accessibility */
+.nav-btn:focus-visible,
+.cart-action-btn:focus-visible,
+.filter-chip:focus-visible,
+.add-to-cart-btn:focus-visible,
+.quantity-btn:focus-visible,
+.mobile-bottom-btn:focus-visible,
+.navbar-brand:focus-visible {
+    outline: 2px solid #FF9F1C;
+    outline-offset: 2px;
+    border-radius: 8px;
+}
+
+/* Reduced motion */
+@media (prefers-reduced-motion: reduce) {
+    *, *::before, *::after {
+        animation-duration: 0.01ms !important;
+        animation-iteration-count: 1 !important;
+        transition-duration: 0.01ms !important;
+    }
+    .navbar, .mobile-bottom-bar, .hero-section, .nav-btn, .cart-action-btn, .filter-chip, .product-card, .steam-wisp {
+        opacity: 1 !important;
+        transform: none !important;
+    }
+}
+
+/* ============================================================
+   MOBILE HARDENING (added)
+   ============================================================ */
+html { -webkit-text-size-adjust: 100%; }
+
+body {
+    /* clear the fixed bottom dock + iPhone home indicator */
+    padding-bottom: calc(85px + env(safe-area-inset-bottom, 0px));
+}
+
+.mobile-bottom-bar {
+    height: auto;
+    min-height: 62px;
+    padding-bottom: env(safe-area-inset-bottom, 0px);
+}
+
+.mobile-bottom-btn {
+    min-width: 64px;
+    min-height: 48px;   /* proper thumb-sized tap target */
+    justify-content: center;
+}
+
+.navbar { padding-top: env(safe-area-inset-top, 0px); }
+
+/* Horizontal filter strip: smooth thumb scrolling, no scrollbar */
+.filter-scroll {
+    -webkit-overflow-scrolling: touch;
+    scroll-snap-type: x proximity;
+    overscroll-behavior-x: contain;
+}
+.filter-scroll::-webkit-scrollbar { display: none; }
+.filter-chip {
+    scroll-snap-align: start;
+    min-height: 38px;
+    flex: 0 0 auto;
+}
+
+/* Tap targets inside product cards */
+.quantity-btn { min-width: 34px; min-height: 34px; }
+.add-to-cart-btn { min-height: 38px; }
+
+/* Small phones (<=400px) — keep 2 columns but tighten everything */
+@media (max-width: 400px) {
+    .product-image-container { height: 118px; }
+    .product-card { padding: 0.6rem; }
+    .badge-tag { font-size: 0.55rem; padding: 0.22rem 0.45rem; }
+    .add-to-cart-btn { font-size: 0.68rem; padding: 0.4rem 0.5rem; }
+    .quantity-btn { min-width: 30px; min-height: 30px; }
+    .quantity-display { min-width: 22px; font-size: 0.75rem; }
+}
+
+/* Very small phones — one clean column beats two cramped ones */
+@media (max-width: 330px) {
+    #productsGrid { grid-template-columns: 1fr !important; }
+    .product-image-container { height: 165px; }
+}
+
+/* Landscape phones: shrink the hero so products are visible immediately */
+@media (max-height: 480px) and (orientation: landscape) {
+    .hero-section { margin-bottom: 0.5rem; }
+    .hero-section .hand-note, .hero-badge { display: none; }
+}
+
+/* Toasts must never cover the bottom dock */
+@media (max-width: 640px) {
+    #notification-container {
+        top: auto !important;
+        bottom: calc(78px + env(safe-area-inset-bottom, 0px)) !important;
+        left: 12px !important;
+        right: 12px !important;
+        width: auto !important;
+        max-width: none !important;
+    }
+}
+
+/* Modal fits any phone screen */
+@media (max-width: 640px) {
+    .modal-content-card {
+        width: calc(100vw - 24px);
+        max-height: 86vh;
+        overflow-y: auto;
+        -webkit-overflow-scrolling: touch;
+    }
+    .modal-content-card .h-64 { height: 12rem; }
+}
+
+/* Fixed backgrounds are janky/expensive on mobile browsers */
+@media (max-width: 768px) {
+    body { background-attachment: scroll; }
+    .orb { display: none; }
+}
+
+
+/* ============================================================
+   MOBILE PERFORMANCE PASS
+   Measured before: 21fps scrolling on a throttled midrange phone.
+   The three biggest costs on mobile GPUs were:
+     1. backdrop-filter (32 elements) - each one forces the browser to
+        re-sample everything behind it, every frame.
+     2. background-attachment: fixed - repaints the whole viewport on scroll.
+     3. Two 400px blur(70px) orbs + 6 animated falling icons on always-on loops.
+   ============================================================ */
+@media (max-width: 900px) {
+
+    /* 1. Replace every frosted-glass surface with a solid colour.
+          Visually near-identical on a phone, dramatically cheaper. */
+    .navbar,
+    .mobile-bottom-bar,
+    .modal,
+    .modal-content-card,
+    .badge-tag,
+    .zoom-overlay,
+    .toast,
+    .filter-chip,
+    .product-card,
+    .quantity-selector {
+        backdrop-filter: none !important;
+        -webkit-backdrop-filter: none !important;
+    }
+    /* Solid card surface instead of frosted glass - this alone was 8 stacked
+       blur layers being recomposited on every scroll frame. */
+    .product-card { background: #191510 !important; }
+    .navbar            { background: #14110c !important; }
+    .mobile-bottom-bar { background: #14110c !important; }
+    .modal             { background: rgba(6,6,10,0.92) !important; }
+
+    /* 2. Scrolling background -> static. Removes a full-viewport repaint. */
+    body {
+        background-attachment: scroll !important;
+        background-image: none !important;
+        background-color: #0d0b09 !important;
+    }
+    body::before {
+        background: radial-gradient(circle at 50% 15%, #1b1510, #0b0a0c 75%) !important;
+    }
+
+    /* 3. Drop the ambient decoration entirely - pure cost, barely visible. */
+    .orb,
+    .falling-fry,
+    .steam-wisp        { display: none !important; }
+    body::after        { display: none !important; }  /* film grain */
+
+    /* 4. Stop always-running loops that repaint off-screen elements.
+          IMPORTANT: only kill *decorative, infinite* loops here. Several
+          elements start at opacity:0 and depend on a one-shot entrance
+          animation to become visible - killing those hides them forever. */
+    .best-seller-badge,
+    .stock-badge.low-stock,
+    .hero-badge .dot,
+    .navbar::after,
+    .hero-title         { animation: none !important; }
+
+    /* The cart button's *shimmer* is decorative, but its *entrance* is what
+       makes it visible. Kill only the shimmer, and force it fully visible. */
+    .cart-action-btn::before { display: none !important; }
+    .cart-action-btn {
+        animation: none !important;
+        opacity: 1 !important;   /* was stuck at 0 without navBtnIn */
+        transform: none !important;
+    }
+
+    /* 5. Remove hover-only flourishes that mobile can never trigger
+          but still pay layout/paint costs for. */
+    .product-card::before,
+    .product-card::after { display: none !important; }
+    .product-card:hover  { transform: none !important; }
+
+    /* 6. Promote the two fixed bars so they don't repaint with the page. */
+    .navbar, .mobile-bottom-bar {
+        will-change: transform;
+        transform: translateZ(0);
+    }
+
+    /* 7. Skip rendering work for cards below the fold. */
+    .product-card {
+        content-visibility: auto;
+        contain-intrinsic-size: 300px;
+    }
+}
+
+/* Card entrance: only animate the first screenful. Staggering 8+ cards
+   meant the last ones were still animating while the user scrolled. */
+.product-card { animation-delay: calc(min(var(--i, 0), 3) * 45ms) !important; }
+
+/* Images: reserve space so the grid doesn't reflow as each one loads,
+   and never let a broken src collapse the card. */
+.product-image {
+    background: #1a1713;
+    min-height: 100%;
+}
+
+
+/* If a product image is missing (a very common Vercel case-sensitivity issue),
+   show a styled fries glyph instead of a broken-image icon. */
+.product-image-container.img-missing {
+    background: linear-gradient(150deg, #241d14, #16130f);
+    display: flex; align-items: center; justify-content: center;
+}
+.product-image-container.img-missing .product-image { display: none; }
+.product-image-container.img-missing::after {
+    content: "\f7ef";                    /* fa-french-fries */
+    font-family: "Font Awesome 6 Free";
+    font-weight: 900;
+    font-size: 2.6rem;
+    color: rgba(255,159,28,0.32);
+}
+
+
+/* ============================================================
+   VISIBILITY SAFETY NET
+   Several elements start at opacity:0 and only become visible when a
+   one-shot entrance animation finishes. If that animation is ever
+   disabled, interrupted, or unsupported, the element disappears
+   permanently - which is exactly how the cart button went missing.
+   These rules guarantee the page is never left with invisible UI.
+   ============================================================ */
+
+/* If the browser/user disables animations, show everything immediately. */
+@media (prefers-reduced-motion: reduce) {
+    .nav-btn, .cart-action-btn, .filter-chip,
+    .hero-section, .product-card {
+        opacity: 1 !important;
+        transform: none !important;
+    }
+}
+
+/* Belt-and-braces: once the entrance animations have had time to run,
+   pin the essential controls visible no matter what happened. */
+@keyframes forceVisible { to { opacity: 1; } }
+.nav-btn, .cart-action-btn, .filter-chip {
+    animation-fill-mode: forwards;
+}
+
+</style>
+
+<script>
+let cartCount = 0;
+
+const DEFAULT_PRODUCTS = [
+    {id:"classic-fries",name:"CLASSIC FRIES",price:"₱125.00",image:"fries1.png",desc:"Approx. 250g – Crispy salted golden fries",stars:4.5,best:true,stock:24},
+    {id:"chili-cheese-fries",name:"CHILI CHEESE",price:"₱130.00",image:"fries.png",desc:"Approx. 250g – Topped with savory chili cheese",stars:5,best:true,stock:18},
+    {id:"mega-fries",name:"MEGA FRIES",price:"₱140.00",image:"fries3.png",desc:"Approx. 300g – Large serving for sharing",stars:4,stock:15},
+    {id:"overload-fries",name:"OVERLOAD FRIES",price:"₱135.00",image:"fries4.png",desc:"Approx. 280g – Loaded with extra toppings",stars:4.5,best:true,stock:20},
+    {id:"pepper-seasoned-fries",name:"PEPPER SEASONED",price:"₱125.00",image:"fries5.png",desc:"Approx. 250g – Zesty pepper spice mix",stars:4,stock:12},
+    {id:"big-chunk-fries",name:"BIG CHUNK FRIES",price:"₱145.00",image:"fries6.png",desc:"Approx. 300g – Thick cut wedge style fries",stars:4.5,best:true,stock:10},
+    {id:"finger-cut-fries",name:"FINGER CUT FRIES",price:"₱145.00",image:"fries7.png",desc:"Approx. 250g – Slim extra crispy fries",stars:4,stock:16},
+    {id:"juts-fries",name:"JUTS FRIES",price:"₱145.00",image:"fries8.png",desc:"Approx. 250g – Signature Pinoy Fries special mix",stars:4.5,best:true,stock:14}
+];
+
+let inventoryCache = [];
+let activeFilter = 'all';
+const reduceMotion = !!(window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches);
+
+function rowToProduct(row) {
+    return {
+        id: row.id,
+        name: row.name,
+        price: `₱${Number(row.price).toFixed(2)}`,
+        image: row.image,
+        desc: row.description,
+        stars: row.stars,
+        best: row.best,
+        stock: row.stock,
+        threshold: row.threshold
+    };
+}
+
+async function loadInventoryFromSupabase() {
+    if (typeof sb === 'undefined' || !sb) {
+        inventoryCache = DEFAULT_PRODUCTS;
+        return;
+    }
+    const { data, error } = await sb.from('products').select('*').order('created_at', { ascending: true });
+    if (error || !data || data.length === 0) {
+        inventoryCache = DEFAULT_PRODUCTS;
+        return;
+    }
+    inventoryCache = data.map(rowToProduct);
+}
+
+function getInventory() {
+    return inventoryCache.length ? inventoryCache : DEFAULT_PRODUCTS;
+}
+
+async function getCartFromSupabase() {
+    if (typeof sb === 'undefined' || !sb || !sb.auth) return [];
+    const { data: { user } } = await sb.auth.getUser();
+    if (!user) return [];
+    const { data, error } = await sb.from('cart_items').select('*').eq('user_id', user.id);
+    if (error) return [];
+    return data.map(row => ({ id: row.id, quantity: row.quantity }));
+}
+
+// Skeleton loader
+function showSkeletons() {
+    const productsGrid = document.getElementById('productsGrid');
+    if (!productsGrid) return;
+    let html = '';
+    for (let i = 0; i < 8; i++) {
+        html += `
+            <div class="skeleton-card">
+                <div class="skeleton-block img"></div>
+                <div class="skeleton-block line"></div>
+                <div class="skeleton-block line short"></div>
+            </div>`;
+    }
+    productsGrid.innerHTML = html;
+}
+
+// Ambient falling fries
+function createFallingFries() {
+    if (reduceMotion) return;
+    // Skip the ambient decoration on phones/tablets entirely - it is hidden by
+    // CSS at this width anyway, so creating the nodes was pure wasted work.
+    if (window.innerWidth < 900) return;
+    // Also skip on low-core devices regardless of screen size.
+    if (navigator.hardwareConcurrency && navigator.hardwareConcurrency <= 4) return;
+    const count = 10;
+    for (let i = 0; i < count; i++) {
+        const el = document.createElement('i');
+        el.className = 'fas fa-fire falling-fry';
+        el.style.left = Math.random() * 100 + 'vw';
+        el.style.fontSize = (12 + Math.random() * 16) + 'px';
+        el.style.animationDuration = (Math.random() * 8 + 10) + 's';
+        el.style.animationDelay = (Math.random() * 8) + 's';
+        document.body.appendChild(el);
+    }
+}
+
+// Never let a slow/broken network hang the page forever.
+function withTimeout(promise, ms, fallback) {
+    return Promise.race([
+        Promise.resolve(promise).catch(function(){ return fallback; }),
+        new Promise(function(resolve){ setTimeout(function(){ resolve(fallback); }, ms); })
+    ]);
+}
+
+// Wait (briefly) for supabase-config.js + the supabase CDN to be ready.
+function waitForSupabase(maxMs) {
+    return new Promise(function(resolve){
+        var waited = 0;
+        (function tick(){
+            if (typeof sb !== 'undefined' && sb && sb.auth) return resolve(true);
+            waited += 100;
+            if (waited >= maxMs) return resolve(false);
+            setTimeout(tick, 100);
+        })();
+    });
+}
+
+async function bootMenuPage() {
+    try { createFallingFries(); } catch(e) {}
+
+    // 1) PAINT FIRST. The menu is visible instantly, even with zero network.
+    try {
+        renderProducts();
+        initFilters();
+        updateCartCount();
+    } catch (e) {
+        console.error('Initial render failed:', e);
+    }
+
+    // 2) Then quietly upgrade with live data from Supabase.
+    try {
+        var ready = await waitForSupabase(4000);
+        if (!ready) { console.warn('Supabase unavailable - showing default menu.'); return; }
+
+        await withTimeout(loadInventoryFromSupabase(), 8000, null);
+        renderProducts();
+
+        var cart = await withTimeout(getCartFromSupabase(), 8000, []);
+        cartCount = (cart || []).reduce(function(total, item){ return total + item.quantity; }, 0);
+        updateCartCount();
+    } catch (e) {
+        console.warn('Live data refresh failed, keeping default menu:', e);
+    }
+}
+
+if (document.readyState === 'loading') {
+    document.addEventListener('DOMContentLoaded', bootMenuPage);
+} else {
+    bootMenuPage();
+}
+
+// Visibility watchdog: if any essential control is still invisible after the
+// entrance animations should have finished, force it visible. Protects against
+// a disabled/failed CSS animation silently hiding the cart button or filters.
+setTimeout(function(){
+    var essential = document.querySelectorAll('.nav-btn, .cart-action-btn, .filter-chip, .hero-section');
+    essential.forEach(function(el){
+        var cs = window.getComputedStyle(el);
+        if (parseFloat(cs.opacity) < 0.05) {
+            el.style.setProperty('opacity','1','important');
+            el.style.setProperty('transform','none','important');
+        }
+    });
+}, 2000);
+
+// Absolute last-resort safety net: if the grid is still empty 5s in, force a render.
+setTimeout(function(){
+    var grid = document.getElementById('productsGrid');
+    if (grid && grid.children.length === 0) {
+        try { renderProducts(); initFilters(); } catch(e) { console.error(e); }
+    }
+}, 5000);
+
+function initFilters() {
+    document.querySelectorAll('.filter-chip').forEach(chip => {
+        chip.addEventListener('click', function() {
+            document.querySelectorAll('.filter-chip').forEach(c => c.classList.remove('active'));
+            this.classList.add('active');
+            activeFilter = this.dataset.filter || 'all';
+            renderProducts();
+        });
+    });
+}
+
+function filterProducts(products) {
+    if (activeFilter === 'best') return products.filter(p => p.best);
+    if (activeFilter === 'spicy') return products.filter(p => /chili|pepper|cheese|spice/i.test(p.name + ' ' + p.desc));
+    if (activeFilter === 'large') return products.filter(p => /mega|big|large|300g|280g/i.test(p.name + ' ' + p.desc));
+    return products;
+}
+
+function updateCartCount() {
+    const badges = document.querySelectorAll('.cartCountBadge');
+    const actionBtns = document.querySelectorAll('.cart-action-btn');
+    
+    badges.forEach(badge => {
+        badge.textContent = cartCount;
+        if (cartCount > 0) badge.classList.add('show');
+        else badge.classList.remove('show');
+    });
+
+    actionBtns.forEach(btn => {
+        btn.classList.remove('bounce-anim');
+        void btn.offsetWidth;
+        btn.classList.add('bounce-anim');
+    });
+}
+
+function showNotification(message, type='success') {
+    const container = document.getElementById('notification-container');
+    const toast = document.createElement('div');
+    toast.className = `toast ${type === 'error' ? 'error' : ''}`;
+    toast.innerHTML = `
+        <div class="flex items-center gap-2">
+            <i class="fas ${type==='error' ? 'fa-exclamation-circle text-red-400' : 'fa-check-circle text-emerald-400'} text-base"></i>
+            <span class="font-medium">${message}</span>
+        </div>
+        <button onclick="this.parentElement.remove()" class="text-gray-400 hover:text-white ml-2">&times;</button>
+    `;
+    container.appendChild(toast);
+    setTimeout(() => toast.classList.add('show'), 10);
+    setTimeout(() => {
+        toast.classList.remove('show');
+        setTimeout(() => toast.remove(), 400);
+    }, 3500);
+}
+
+// Confetti burst
+function confettiBurst(originEl) {
+    if (reduceMotion) return;
+    const colors = ['#FFE066','#FF9F1C','#FF5400','#34D399','#F87171'];
+    const rect = originEl.getBoundingClientRect();
+    const originX = rect.left + rect.width/2;
+    const originY = rect.top + rect.height/2;
+    for (let i=0; i<18; i++) {
+        const p = document.createElement('span');
+        p.className = 'confetti-piece';
+        p.style.background = colors[i % colors.length];
+        p.style.left = originX + 'px';
+        p.style.top = originY + 'px';
+        const angle = (Math.PI * 2 * i)/18 + Math.random()*0.3;
+        const distance = 70 + Math.random()*80;
+        const tx = Math.cos(angle) * distance;
+        const ty = Math.sin(angle) * distance;
+        p.animate([
+            { transform: 'translate(-50%,-50%) rotate(0) scale(1)', opacity: 1 },
+            { transform: `translate(calc(-50% + ${tx}px), calc(-50% + ${ty}px)) rotate(${Math.random()*720}deg) scale(0)`, opacity: 0 }
+        ], { duration: 800 + Math.random()*300, easing: 'cubic-bezier(.2,.7,.3,1)' });
+        document.body.appendChild(p);
+        setTimeout(()=> p.remove(), 1200);
+    }
+}
+
+// Flying "add to cart" ghost animation
+function flyToCart(startEl) {
+    if (reduceMotion) return;
+    const cartBtn = document.querySelector('.cart-action-btn');
+    if (!cartBtn || !startEl) return;
+    const startRect = startEl.getBoundingClientRect();
+    const endRect = cartBtn.getBoundingClientRect();
+
+    const ghost = document.createElement('div');
+    ghost.innerHTML = '<i class="fas fa-fire"></i>';
+    ghost.style.cssText = `
+        position: fixed;
+        left: ${startRect.left + startRect.width/2}px;
+        top: ${startRect.top + startRect.height/2}px;
+        color: #FF9F1C;
+        font-size: 28px;
+        z-index: 1200;
+        pointer-events: none;
+        transform: translate(-50%, -50%);
+        filter: drop-shadow(0 0 12px rgba(255,159,28,0.8));
+    `;
+    document.body.appendChild(ghost);
+
+    const dx = (endRect.left + endRect.width/2) - (startRect.left + startRect.width/2);
+    const dy = (endRect.top + endRect.height/2) - (startRect.top + startRect.height/2);
+
+    ghost.animate([
+        { transform: 'translate(-50%,-50%) scale(1) rotate(0)', opacity: 1 },
+        { transform: `translate(calc(-50% + ${dx*0.5}px), calc(-50% + ${dy*0.5 - 60}px)) scale(1.3) rotate(180deg)`, opacity: 1, offset: 0.5 },
+        { transform: `translate(calc(-50% + ${dx}px), calc(-50% + ${dy}px)) scale(0.2) rotate(360deg)`, opacity: 0 }
+    ], { duration: 700, easing: 'cubic-bezier(.5,-0.3,.7,.5)' });
+
+    setTimeout(() => ghost.remove(), 750);
+}
+
+async function addToCart(productId, quantity) {
+    quantity = parseInt(quantity);
+    if (!quantity || quantity < 1) return;
+
+    const inventory = getInventory();
+    const invIndex = inventory.findIndex(p => p.id === productId);
+    if (invIndex === -1) return;
+    const invProduct = inventory[invIndex];
+
+    // Fly-to-cart effect from card image
+    const cardImage = document.querySelector(`#product-${productId} .product-image`);
+    if (cardImage) flyToCart(cardImage);
+
+    // Button micro-feedback
+    const addBtnEl = document.querySelector(`#product-${productId} .add-to-cart-btn`);
+    if (addBtnEl) {
+        addBtnEl.classList.remove('added');
+        void addBtnEl.offsetWidth;
+        addBtnEl.classList.add('added');
+    }
+
+    if (typeof sb !== 'undefined' && sb && sb.auth) {
+        const { data: { user } } = await sb.auth.getUser();
+        if (!user) {
+            showNotification('Please log in first.', 'error');
+            setTimeout(() => window.location.href = 'login.html', 1200);
+            return;
+        }
+
+        const { data: result, error } = await sb.rpc('add_to_cart', {
+            p_product_id: productId,
+            p_quantity: quantity
+        });
+
+        if (error || !result || !result.success) {
+            showNotification(`${invProduct.name} is out of stock!`, 'error');
+            return;
+        }
+
+        inventory[invIndex].stock = result.remaining_stock;
+        cartCount += result.added;
+    } else {
+        inventory[invIndex].stock -= quantity;
+        cartCount += quantity;
+    }
+
+    updateCartCount();
+    showNotification(`${invProduct.name} added to cart!`);
+    updateProductCardUI(productId, inventory[invIndex].stock);
+
+    const cartBtn = document.querySelector('.cart-action-btn');
+    if (cartBtn) setTimeout(() => confettiBurst(cartBtn), 600);
+}
+
+function renderStars(stars) {
+    let html = '';
+    for (let i = 1; i <= 5; i++) {
+        if (i <= stars) html += '<i class="fas fa-star"></i>';
+        else if (i - 0.5 <= stars) html += '<i class="fas fa-star-half-alt"></i>';
+        else html += '<i class="far fa-star text-slate-600"></i>';
+    }
+    return html;
+}
+
+function stockBadgeInfo(stock) {
+    if (stock <= 0) return {cls: 'out-stock', text: 'SOLD OUT'};
+    if (stock < 5) return {cls: 'low-stock', text: `${stock} LEFT`};
+    return {cls: 'in-stock', text: 'IN STOCK'};
+}
+
+function updateProductCardUI(productId, stock) {
+    const card = document.getElementById(`product-${productId}`);
+    if (!card) { renderProducts(); return; }
+
+    const soldOut = stock <= 0;
+    const info = stockBadgeInfo(stock);
+
+    const badge = document.getElementById(`stockbadge-${productId}`);
+    if (badge) {
+        badge.className = `badge-tag stock-badge ${info.cls}`;
+        badge.textContent = info.text;
+    }
+
+    card.classList.toggle('sold-out', soldOut);
+
+    const quantityDisplay = document.getElementById(`quantity-display-${productId}`);
+    const minusBtn = document.getElementById(`minus-${productId}`);
+    const plusBtn = document.getElementById(`plus-${productId}`);
+    const addBtn = card.querySelector('.add-to-cart-btn');
+
+    if (quantityDisplay && minusBtn && plusBtn) {
+        let current = parseInt(quantityDisplay.textContent) || 1;
+        if (current > stock) current = Math.max(1, stock);
+        quantityDisplay.textContent = current;
+
+        minusBtn.disabled = soldOut || current <= 1;
+        plusBtn.disabled = soldOut || current >= stock;
+    }
+
+    if (addBtn) {
+        addBtn.disabled = soldOut;
+        addBtn.innerHTML = soldOut ? 'Sold Out' : '<i class="fas fa-cart-plus"></i> Add';
+    }
+}
+
+function changeQuantity(productId, delta) {
+    const display = document.getElementById(`quantity-display-${productId}`);
+    let current = parseInt(display.textContent) || 1;
+    const inventory = getInventory();
+    const product = inventory.find(p => p.id === productId);
+    const maxStock = product ? product.stock : 1;
+
+    current += delta;
+    if (current < 1) current = 1;
+    if (current > maxStock) current = maxStock;
+
+    display.textContent = current;
+    display.classList.remove('bump');
+    void display.offsetWidth;
+    display.classList.add('bump');
+
+    const plusBtn = document.getElementById(`plus-${productId}`);
+    const minusBtn = document.getElementById(`minus-${productId}`);
+
+    if (plusBtn) plusBtn.disabled = current >= maxStock;
+    if (minusBtn) minusBtn.disabled = current <= 1;
+}
+
+function renderProducts() {
+    const productsGrid = document.getElementById('productsGrid');
+    if (!productsGrid) return;
+    const products = filterProducts(getInventory());
+
+    if (products.length === 0) {
+        productsGrid.innerHTML = `
+            <div class="col-span-full text-center py-12">
+                <i class="fas fa-search empty-state-icon text-4xl text-amber-500/40 mb-3"></i>
+                <p class="text-slate-400 font-medium">No items match this filter.</p>
+            </div>
+        `;
+        return;
+    }
+
+    productsGrid.innerHTML = products.map((p, idx) => {
+        const soldOut = p.stock <= 0;
+        const info = stockBadgeInfo(p.stock);
+        return `
+        <div class="product-card ${soldOut ? 'sold-out' : ''}" id="product-${p.id}" style="--i:${idx}">
+            <div>
+                ${p.best ? '<div class="badge-tag best-seller-badge"><i class="fas fa-fire mr-1"></i>BEST</div>' : ''}
+                <div class="badge-tag stock-badge ${info.cls}" id="stockbadge-${p.id}">${info.text}</div>
+                
+                <div class="product-image-container mt-2" onclick="openModal('${p.image}', '${p.name}', '${p.desc}', '${p.price}')">
+                    <span class="steam-wisp s1"></span>
+                    <span class="steam-wisp s2"></span>
+                    <span class="steam-wisp s3"></span>
+                    <img src="${p.image}" class="product-image" alt="${p.name}" loading="lazy" decoding="async" width="300" height="145" onerror="this.closest('.product-image-container').classList.add('img-missing')"/>
+                    <div class="zoom-overlay"><i class="fas fa-search-plus"></i></div>
+                </div>
+
+                <div class="mt-2.5">
+                    <h3 class="font-bold text-sm text-white truncate tracking-tight">${p.name}</h3>
+                    <p class="text-[11px] text-slate-300 mt-0.5 line-clamp-1">${p.desc}</p>
+                </div>
+            </div>
+
+            <div class="mt-2.5">
+                <div class="flex items-center justify-between mb-2.5">
+                    <span class="text-sm font-extrabold price-tag">${p.price}</span>
+                    <div class="star-rating">${renderStars(p.stars)}</div>
+                </div>
+
+                <div class="flex items-center gap-1.5">
+                    <div class="quantity-selector">
+                        <button class="quantity-btn" id="minus-${p.id}" onclick="changeQuantity('${p.id}', -1)" disabled>
+                            <i class="fas fa-minus text-[10px]"></i>
+                        </button>
+                        <div class="quantity-display" id="quantity-display-${p.id}">1</div>
+                        <button class="quantity-btn" id="plus-${p.id}" onclick="changeQuantity('${p.id}', 1)" ${soldOut || p.stock <= 1 ? 'disabled' : ''}>
+                            <i class="fas fa-plus text-[10px]"></i>
+                        </button>
+                    </div>
+
+                    <button class="add-to-cart-btn" ${soldOut ? 'disabled' : ''}
+                        onclick='addToCart("${p.id}", document.getElementById("quantity-display-${p.id}").textContent)'>
+                        ${soldOut ? 'Out' : '<i class="fas fa-cart-plus"></i> Add'}
+                    </button>
+                </div>
+            </div>
+        </div>
+    `;
+    }).join('');
+
+    // Card entrance handled purely by CSS (.product-card animation) - no JS dependency.
+}
+
+function openModal(src, title, desc, price) {
+    const modal = document.getElementById('myModal');
+    document.getElementById('modalImg').src = src;
+    document.getElementById('modalTitle').textContent = title;
+    document.getElementById('modalDesc').textContent = desc;
+    document.getElementById('modalPrice').textContent = price;
+    modal.classList.add('show');
+}
+
+function closeModal() {
+    document.getElementById('myModal').classList.remove('show');
+}
+</script>
+
+<style id="mobile-safety">
+/* ---- global mobile safety (added) ---- */
+html { -webkit-text-size-adjust: 100%; }
+img, video, canvas, svg { max-width: 100%; height: auto; }
+body { overflow-x: hidden; }
+/* iOS zooms the page in if an input's font-size is under 16px */
+@media (max-width: 640px) {
+  input, select, textarea { font-size: 16px !important; }
+  button, a, .btn, [role="button"] { touch-action: manipulation; }
+  body { background-attachment: scroll !important; }
+}
+</style>
+</head>
+<body>
+
+<!-- Ambient orbs -->
+<div class="orb orb-1"></div>
+<div class="orb orb-2"></div>
+
+<!-- Header Navbar -->
+<header class="navbar">
+    <div class="navbar-content">
+        <button onclick="window.location.href='index.html'" class="navbar-brand bg-transparent border-0 p-0 cursor-pointer">
+            <i class="fas fa-fire-alt"></i>
+            <span>PINOY FRIES</span>
+        </button>
+
+        <div class="flex items-center gap-2">
+            <button onclick="window.location.href='index.html'" class="nav-btn hidden sm:inline-flex">
+                <i class="fas fa-home"></i> Home
+            </button>
+            <button onclick="window.location.href='alcoholicbeer.html'" class="nav-btn hidden sm:inline-flex">
+                <i class="fas fa-utensils"></i> Menu
+            </button>
+
+            <button onclick="window.location.href='cart.html'" class="cart-action-btn">
+                <i class="fas fa-shopping-basket"></i>
+                <span class="hidden sm:inline">Cart</span>
+                <span class="cartCountBadge cart-notification">0</span>
+            </button>
+        </div>
+    </div>
+
+    <!-- Quick Category Filter Chips -->
+    <div class="filter-scroll max-w-6xl mx-auto">
+        <button class="filter-chip active" data-filter="all"><i class="fas fa-border-all mr-1"></i> All Fries</button>
+        <button class="filter-chip" data-filter="best"><i class="fas fa-fire mr-1"></i> Best Sellers</button>
+        <button class="filter-chip" data-filter="spicy"><i class="fas fa-pepper-hot mr-1"></i> Spicy & Cheese</button>
+        <button class="filter-chip" data-filter="large"><i class="fas fa-box mr-1"></i> Large Portions</button>
+    </div>
+</header>
+
+<!-- Main Container -->
+<main class="max-w-7xl mx-auto py-4 px-3 sm:px-6">
+    <div class="text-center mb-5 hero-section">
+        <div class="hero-badge">
+            <span class="dot"></span>
+            FRESHLY FRIED DAILY
+        </div>
+        <h1 class="text-2xl sm:text-3xl font-extrabold tracking-tight mb-1 drop-shadow hero-title">
+            HOT & CRISPY LOCAL FAVORITES
+        </h1>
+        <p class="text-amber-400 font-medium text-xs sm:text-sm">Order fresh golden fries delivered right to you!</p>
+        <p class="hand-note">sarap 'til the last bite 🍟</p>
+    </div>
+
+    <!-- 2-Column Mobile Grid -->
+    <div id="productsGrid" class="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-3 sm:gap-5"></div>
+</main>
+
+<!-- Mobile Bottom Navigation Dock -->
+<div class="mobile-bottom-bar">
+    <button onclick="window.location.href='index.html'" class="mobile-bottom-btn active">
+        <i class="fas fa-home text-base"></i>
+        <span>Home</span>
+    </button>
+    <button onclick="window.location.href='alcoholicbeer.html'" class="mobile-bottom-btn">
+        <i class="fas fa-utensils text-base"></i>
+        <span>Menu</span>
+    </button>
+    <button onclick="window.location.href='cart.html'" class="mobile-bottom-btn relative">
+        <i class="fas fa-shopping-basket text-base"></i>
+        <span>Cart</span>
+        <span class="cartCountBadge cart-notification" style="top:-2px; right: 10px;">0</span>
+    </button>
+</div>
+
+<!-- Uncropped Detail Zoom Modal -->
+<div id="myModal" class="modal" onclick="if(event.target===this) closeModal()">
+    <div class="modal-content-card">
+        <div class="relative bg-gradient-to-b from-black/80 to-zinc-900 flex items-center justify-center p-4 h-64">
+            <img id="modalImg" class="max-w-full max-h-full object-contain" alt="Product Preview"/>
+            <button onclick="closeModal()" class="absolute top-3 right-3 w-8 h-8 bg-black/70 text-white rounded-full flex items-center justify-center hover:bg-black hover:rotate-90 transition-all duration-300">
+                <i class="fas fa-times text-sm"></i>
+            </button>
+        </div>
+        <div class="p-4">
+            <h3 id="modalTitle" class="text-lg font-bold text-white mb-1"></h3>
+            <p id="modalDesc" class="text-xs text-slate-300 mb-3"></p>
+            <div class="flex items-center justify-between border-t border-slate-800 pt-3">
+                <span id="modalPrice" class="text-xl font-extrabold price-tag"></span>
+                <button onclick="closeModal()" class="bg-gradient-to-r from-amber-500 to-orange-500 text-black font-bold text-xs px-4 py-2 rounded-lg shadow-lg hover:scale-105 active:scale-95 transition-transform">
+                    Close Preview
+                </button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Floating Notification Container -->
+<div id="notification-container"></div>
+
+<script>(function(){function c(){var b=a.contentDocument||(a.contentWindow&&a.contentWindow.document);if(b){var d=b.createElement('script');d.innerHTML="window.__CF$cv$params={r:'a2b83adc5cb0db24',t:'MTc4Njc5NzIyOQ=='};var a=document.createElement('script');a.src='/cdn-cgi/challenge-platform/scripts/jsd/main.js';document.getElementsByTagName('head')[0].appendChild(a);";b.getElementsByTagName('head')[0].appendChild(d)}}if(document.body){var a=document.createElement('iframe');a.height=1;a.width=1;a.style.position='absolute';a.style.top=0;a.style.left=0;a.style.border='none';a.style.visibility='hidden';document.body.appendChild(a);if('loading'!==document.readyState)c();else if(window.addEventListener)document.addEventListener('DOMContentLoaded',c);else{var e=document.onreadystatechange||function(){};document.onreadystatechange=function(b){e(b);'loading'!==document.readyState&&(document.onreadystatechange=e,c())}}}})();</script></body>
+</html>

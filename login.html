@@ -1,0 +1,599 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover"/>
+  <meta name="theme-color" content="#120B07"/>
+  <title>Log In / Sign Up | PINOY FRIES</title>
+  <link rel="icon" href="logo.png" type="image/png"/>
+
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Baloo+2:wght@500;600;700;800&family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=JetBrains+Mono:wght@500;700&family=Caveat:wght@600;700&display=swap" rel="stylesheet">
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet"/>
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <script>
+  (function(){
+    var el = document.createElement('script');
+    el.src = 'supabase-config.js';
+    el.async = false;
+    el.onerror = function(){ console.error('supabase-config.js failed to load.'); };
+    document.head.appendChild(el);
+  })();
+</script>
+
+  <style>
+    :root{
+      --ink:#120B07;
+      --ink-2:#1C1209;
+      --card-line: rgba(255,182,39,0.15);
+      --gold:#FFB627;
+      --gold-soft:#FFDA97;
+      --ember:#FF6B35;
+      --jeep:#D62839;
+      --paper:#FFF6E7;
+      --muted:#B3A28D;
+      --success:#34D399;
+    }
+    *{ -webkit-tap-highlight-color: transparent; box-sizing:border-box; }
+    body{
+      font-family:'Plus Jakarta Sans', sans-serif;
+      background:var(--ink);
+      color:var(--paper);
+      min-height:100vh;
+      overflow-x:hidden;
+      position:relative;
+    }
+    .font-display{ font-family:'Baloo 2', sans-serif; }
+    .font-mono{ font-family:'JetBrains Mono', monospace; }
+    .font-hand{ font-family:'Caveat', cursive; }
+    ::selection{ background:var(--gold); color:#160D06; }
+    :focus-visible{ outline:2px solid var(--gold); outline-offset:3px; }
+    ::-webkit-scrollbar{ width:0; background:transparent; }
+
+    /* film grain */
+    body::before{
+      content:""; position:fixed; inset:0; z-index:500; pointer-events:none;
+      opacity:.045; mix-blend-mode:overlay;
+      background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='120' height='120'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='2' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
+    }
+
+    /* ambient mesh background, slow breathing drift */
+    .mesh-gradient{
+      position:fixed; inset:0; z-index:-2; background-color:var(--ink);
+      background-image:
+        radial-gradient(at 15% 10%, hsla(42,100%,55%,0.16) 0, transparent 55%),
+        radial-gradient(at 85% 90%, hsla(16,100%,55%,0.18) 0, transparent 55%),
+        radial-gradient(at 90% 5%, hsla(350,72%,50%,0.10) 0, transparent 50%),
+        radial-gradient(at 5% 95%, hsla(42,100%,55%,0.08) 0, transparent 50%);
+      background-size:160% 160%;
+      animation: meshDrift 16s ease-in-out infinite alternate;
+    }
+    @keyframes meshDrift{
+      0%{ background-position:0% 0%; }
+      100%{ background-position:12% 8%; }
+    }
+
+    .falling-fries{ position:fixed; top:-100px; opacity:0.14; animation: fall linear infinite; z-index:-1; }
+    @keyframes fall{ to{ transform:translateY(112vh) rotate(360deg); } }
+
+    /* ===== top bar ===== */
+    .app-topbar{
+      background: rgba(18,11,7,0.55);
+      backdrop-filter: blur(16px); -webkit-backdrop-filter: blur(16px);
+      border-bottom: 1px solid var(--card-line);
+    }
+
+    /* ===== entrance choreography ===== */
+    .stagger{ opacity:0; transform:translateY(18px); animation: riseIn .6s cubic-bezier(.2,.7,.2,1) forwards; }
+    @keyframes riseIn{ to{ opacity:1; transform:translateY(0); } }
+
+    /* ===== auth card ===== */
+    .auth-card{
+      background: rgba(28,18,9,0.66);
+      border: 1px solid var(--card-line);
+      backdrop-filter: blur(24px);
+      box-shadow: 0 40px 100px -20px rgba(0,0,0,0.8);
+      transition: border-color 0.5s ease, box-shadow 0.5s ease;
+    }
+    .auth-card:hover{ border-color: rgba(255,182,39,0.32); }
+
+    .logo-badge{
+      background: rgba(255,182,39,0.1);
+      border: 1px solid rgba(255,182,39,0.25);
+      box-shadow: 0 0 24px rgba(255,182,39,0.08);
+      position:relative;
+      transition: background .4s ease, box-shadow .4s ease;
+    }
+    .logo-badge.badge-success{
+      background: rgba(52,211,153,0.12);
+      border-color: rgba(52,211,153,0.35);
+      box-shadow: 0 0 30px rgba(52,211,153,0.25);
+    }
+    .logo-badge i{ transition: transform .3s cubic-bezier(.34,1.56,.64,1), opacity .2s ease; }
+    .badge-pop i{ animation: badgePop .5s cubic-bezier(.34,1.56,.64,1); }
+    @keyframes badgePop{ 0%{ transform:scale(0.3) rotate(-20deg); opacity:0; } 60%{ transform:scale(1.15) rotate(6deg); } 100%{ transform:scale(1) rotate(0); opacity:1; } }
+
+    .steam{ position:absolute; top:-2px; opacity:0; font-size:.7rem; color:var(--gold-soft); animation: rise 3.2s ease-in infinite; pointer-events:none; }
+    .steam:nth-child(2){ left:60%; animation-delay:1s; }
+    .steam:nth-child(3){ left:35%; animation-delay:2s; }
+    @keyframes rise{ 0%{ opacity:0; transform:translateY(0) scale(.7); } 25%{ opacity:.6; } 100%{ opacity:0; transform:translateY(-30px) scale(1.1); } }
+
+    /* ===== tabs ===== */
+    .tab-btn{
+      position: relative; flex: 1; padding: 16px;
+      font-weight: 700; font-size: 0.72rem; letter-spacing: 2px;
+      color: var(--muted); transition: color 0.35s ease;
+    }
+    .tab-btn.active{ color: var(--gold); }
+    .tab-indicator{
+      position: absolute; bottom: 0; left: 0; height: 2px;
+      background: linear-gradient(90deg,var(--gold),var(--ember));
+      transition: transform 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+      box-shadow: 0 0 14px rgba(255,182,39,0.6);
+    }
+
+    /* ===== inputs ===== */
+    .input-group{ position: relative; margin-bottom: 1.15rem; }
+    .input-field{
+      width: 100%; padding: 16px 46px 16px 48px;
+      background: rgba(255, 255, 255, 0.03);
+      border: 1px solid rgba(255, 255, 255, 0.08);
+      border-radius: 16px; color: var(--paper); font-size: 0.95rem;
+      outline: none; transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    }
+    .input-field:focus{
+      border-color: var(--gold);
+      background: rgba(255, 182, 39, 0.05);
+      box-shadow: 0 0 0 4px rgba(255, 182, 39, 0.1);
+    }
+    .input-field:focus ~ .field-icon{ color: var(--gold); transform:translateY(-50%) scale(1.08); }
+    .input-field.field-invalid{ border-color: rgba(214,40,57,0.6); animation: shakeX .4s; }
+    .field-icon{
+      position: absolute; left: 18px; top: 50%; transform: translateY(-50%);
+      color: #6b5c47; font-size: 1rem; transition: color 0.3s ease, transform .3s ease; pointer-events: none;
+    }
+    .toggle-eye{
+      position: absolute; right: 18px; top: 50%; transform: translateY(-50%);
+      color: #6b5c47; cursor: pointer; font-size: 1rem; transition: color 0.3s ease; z-index: 10;
+    }
+    .toggle-eye:hover{ color: var(--gold); }
+
+    @keyframes shakeX{
+      0%,100%{ transform:translateX(0); }
+      20%{ transform:translateX(-6px); }
+      40%{ transform:translateX(5px); }
+      60%{ transform:translateX(-4px); }
+      80%{ transform:translateX(3px); }
+    }
+    .shake-card{ animation: shakeX .45s; }
+
+    /* ===== submit button ===== */
+    .btn-submit{
+      background: linear-gradient(120deg, var(--gold), var(--ember) 85%);
+      color: #170D05; font-weight: 800; font-size: 0.88rem; letter-spacing: 1px;
+      padding: 16px; border-radius: 16px; width: 100%;
+      transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1), box-shadow .3s ease, opacity .3s ease;
+      border: none; cursor: pointer; position: relative; overflow: hidden;
+      box-shadow: 0 18px 38px -14px rgba(255,107,53,0.55);
+    }
+    .btn-submit::after{
+      content: ''; position: absolute; top: 0; left: -60%; width: 40%; height: 100%;
+      background: linear-gradient(115deg, transparent, rgba(255,255,255,0.55), transparent);
+      transform: skewX(-20deg); animation: sweep 3.4s ease-in-out infinite;
+    }
+    @keyframes sweep{ 0%,60%{ left:-60%; } 100%{ left:130%; } }
+    .btn-submit:hover{ transform: translateY(-2px); box-shadow: 0 24px 46px -12px rgba(255,107,53,0.6); }
+    .btn-submit:active{ transform: translateY(0) scale(0.98); }
+    .btn-submit:disabled{ opacity:.75; cursor:not-allowed; }
+    .btn-submit .btn-label{ display:flex; align-items:center; justify-content:center; gap:8px; transition: opacity .2s ease; }
+    .btn-submit .btn-spinner{
+      display:none; position:absolute; inset:0; align-items:center; justify-content:center;
+    }
+    .btn-submit.is-loading .btn-label{ opacity:0; }
+    .btn-submit.is-loading .btn-spinner{ display:flex; }
+    .spinner-ring{
+      width:20px; height:20px; border-radius:50%;
+      border:2.5px solid rgba(23,13,5,0.25); border-top-color:#170D05;
+      animation: spin .7s linear infinite;
+    }
+    @keyframes spin{ to{ transform:rotate(360deg); } }
+
+    /* ===== form panels (directional slide) ===== */
+    .form-panel{ display:none; }
+    .form-panel.active{ display:block; }
+    @keyframes panelInRight{ from{ opacity:0; transform:translateX(26px); } to{ opacity:1; transform:translateX(0); } }
+    @keyframes panelInLeft{ from{ opacity:0; transform:translateX(-26px); } to{ opacity:1; transform:translateX(0); } }
+    .anim-in-right{ animation: panelInRight .38s cubic-bezier(.2,.7,.2,1); }
+    .anim-in-left{ animation: panelInLeft .38s cubic-bezier(.2,.7,.2,1); }
+
+    /* ===== messages ===== */
+    .error-msg, .success-msg{
+      display: none; align-items:center; font-size: 0.85rem;
+      padding: 12px 16px; border-radius: 12px; margin-bottom: 20px;
+      animation: slideDown 0.3s ease forwards;
+    }
+    .error-msg{ background: rgba(214,40,57,0.1); border: 1px solid rgba(214,40,57,0.25); color: #ffb1b1; }
+    .success-msg{ background: rgba(52,211,153,0.1); border: 1px solid rgba(52,211,153,0.25); color: #8ff0cd; }
+    @keyframes slideDown{ from{ opacity: 0; transform: translateY(-10px); } to{ opacity: 1; transform: translateY(0); } }
+
+    .hand-note{ font-family:'Caveat',cursive; color: var(--gold-soft); font-weight:700; }
+
+    @media (prefers-reduced-motion: reduce){
+      .mesh-gradient, .falling-fries, .btn-submit::after, .steam, .stagger, .anim-in-right, .anim-in-left, .badge-pop i{
+        animation:none !important;
+      }
+      .stagger{ opacity:1; transform:none; }
+    }
+  </style>
+
+<style id="mobile-safety">
+/* ---- global mobile safety (added) ---- */
+html { -webkit-text-size-adjust: 100%; }
+img, video, canvas, svg { max-width: 100%; height: auto; }
+body { overflow-x: hidden; }
+/* iOS zooms the page in if an input's font-size is under 16px */
+@media (max-width: 640px) {
+  input, select, textarea { font-size: 16px !important; }
+  button, a, .btn, [role="button"] { touch-action: manipulation; }
+  body { background-attachment: scroll !important; }
+}
+</style>
+</head>
+<body class="flex items-center justify-center px-6 pt-24 pb-16">
+
+  <div class="mesh-gradient"></div>
+  <div id="friesContainer"></div>
+
+  <header class="app-topbar fixed top-0 left-0 w-full px-6 py-4 md:px-10 flex justify-between items-center z-50">
+    <a href="index.html" class="flex items-center group">
+      <i class="fas fa-arrow-left text-neutral-400 group-hover:text-amber-400 transition-colors mr-4 text-sm"></i>
+      <img src="logo.png" alt="Logo" class="h-8 w-8 rounded-lg transition-transform duration-700 group-hover:rotate-[360deg]"/>
+      <span class="ml-3 font-display text-lg font-bold tracking-tight text-white">
+        PINOY <span class="text-amber-400">FRIES</span>
+      </span>
+    </a>
+  </header>
+
+  <main class="w-full max-w-md z-10">
+    <div class="auth-card rounded-[32px] p-8 sm:p-12 stagger" style="animation-delay:.05s">
+
+      <div class="text-center mb-9">
+        <div class="logo-badge w-20 h-20 rounded-3xl flex items-center justify-center mx-auto mb-6 text-amber-400 text-3xl" id="logoBadge">
+          <span class="steam"><i class="fas fa-fire"></i></span>
+          <span class="steam"><i class="fas fa-fire"></i></span>
+          <i class="fas fa-fire" id="badgeIcon"></i>
+        </div>
+        <h1 class="font-display text-3xl font-bold tracking-tight mb-2" id="authTitle">Welcome Back</h1>
+        <p class="text-neutral-400 text-sm" id="authSubtitle">Log in to your account to start ordering</p>
+      </div>
+
+      <div class="relative flex border-b border-white/5 mb-9 stagger" style="animation-delay:.1s">
+        <button class="tab-btn active" id="loginTabBtn" onclick="switchTab('login')">LOG IN</button>
+        <button class="tab-btn" id="signupTabBtn" onclick="switchTab('signup')">SIGN UP</button>
+        <div class="tab-indicator w-1/2" id="tabIndicator"></div>
+      </div>
+
+      <div class="error-msg" id="errorMsg"><i class="fas fa-circle-exclamation mr-2"></i><span id="errorText"></span></div>
+      <div class="success-msg" id="successMsg"><i class="fas fa-circle-check mr-2"></i><span id="successText"></span></div>
+
+      <div class="stagger" style="animation-delay:.15s">
+        <form id="loginForm" class="form-panel active" onsubmit="handleLogin(event)">
+          <div class="input-group">
+            <input type="email" id="loginEmail" class="input-field" placeholder="Email address" required/>
+            <i class="fas fa-envelope field-icon"></i>
+          </div>
+          <div class="input-group">
+            <input type="password" id="loginPassword" class="input-field" placeholder="Password" required/>
+            <i class="fas fa-lock field-icon"></i>
+            <i class="fas fa-eye toggle-eye" onclick="togglePassword('loginPassword', this)"></i>
+          </div>
+          <div class="flex justify-end mb-8">
+            <a href="forgot-password.html" class="text-xs font-semibold text-amber-400/80 hover:text-amber-400 transition-colors">Forgot password?</a>
+          </div>
+          <button type="submit" class="btn-submit">
+            <span class="btn-label">LOG IN <i class="fas fa-arrow-right text-xs"></i></span>
+            <span class="btn-spinner"><span class="spinner-ring"></span></span>
+          </button>
+        </form>
+
+        <form id="signupForm" class="form-panel" onsubmit="handleSignup(event)">
+          <div class="input-group">
+            <input type="text" id="signupName" class="input-field" placeholder="Full name" required/>
+            <i class="fas fa-user field-icon"></i>
+          </div>
+          <div class="input-group">
+            <input type="email" id="signupEmail" class="input-field" placeholder="Email address" required/>
+            <i class="fas fa-envelope field-icon"></i>
+          </div>
+          <div class="input-group">
+            <input type="tel" id="signupPhone" class="input-field" placeholder="Phone number" required/>
+            <i class="fas fa-phone field-icon"></i>
+          </div>
+          <div class="input-group">
+            <input type="password" id="signupPassword" class="input-field" placeholder="Password" required minlength="6"/>
+            <i class="fas fa-lock field-icon"></i>
+            <i class="fas fa-eye toggle-eye" onclick="togglePassword('signupPassword', this)"></i>
+          </div>
+          <div class="input-group mb-8">
+            <input type="password" id="signupConfirmPassword" class="input-field" placeholder="Confirm password" required minlength="6"/>
+            <i class="fas fa-lock field-icon"></i>
+            <i class="fas fa-eye toggle-eye" onclick="togglePassword('signupConfirmPassword', this)"></i>
+          </div>
+          <button type="submit" class="btn-submit">
+            <span class="btn-label">CREATE ACCOUNT <i class="fas fa-user-plus text-xs"></i></span>
+            <span class="btn-spinner"><span class="spinner-ring"></span></span>
+          </button>
+        </form>
+      </div>
+
+      <footer class="mt-9 pt-7 border-t border-white/5 stagger" style="animation-delay:.2s">
+        <p class="text-center hand-note text-base mb-2">sarap loading, promise 🍟</p>
+        <p class="text-center text-neutral-500 text-[10px] leading-relaxed uppercase tracking-widest">
+          By continuing, you agree to our<br>
+          <a href="#" class="text-neutral-400 hover:text-amber-400 transition-colors">Terms of Service</a> &
+          <a href="#" class="text-neutral-400 hover:text-amber-400 transition-colors">Privacy Policy</a>
+        </p>
+      </footer>
+    </div>
+  </main>
+
+  <script>
+    // ---------- ambient falling fries ----------
+    const reduceMotion = !!(window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches);
+    const container = document.getElementById('friesContainer');
+    if (container && !reduceMotion) {
+      const count = window.innerWidth < 640 ? 5 : 8;
+      for (let i = 0; i < count; i++) {
+        let asset = document.createElement('img');
+        asset.src = 'logo.png';
+        asset.classList.add('falling-fries');
+        asset.style.left = Math.random() * 100 + 'vw';
+        asset.style.width = (12 + Math.random() * 14) + 'px';
+        asset.style.animationDuration = (Math.random() * 6 + 8) + 's';
+        asset.style.animationDelay = (Math.random() * 6) + 's';
+        container.appendChild(asset);
+      }
+    }
+
+    // ---------- tab switching with directional slide ----------
+    function switchTab(tab) {
+      clearMessages();
+      const loginForm = document.getElementById('loginForm');
+      const signupForm = document.getElementById('signupForm');
+      const loginTabBtn = document.getElementById('loginTabBtn');
+      const signupTabBtn = document.getElementById('signupTabBtn');
+      const indicator = document.getElementById('tabIndicator');
+      const title = document.getElementById('authTitle');
+      const subtitle = document.getElementById('authSubtitle');
+
+      const incoming = tab === 'login' ? loginForm : signupForm;
+      const outgoing = tab === 'login' ? signupForm : loginForm;
+      const animClass = tab === 'login' ? 'anim-in-left' : 'anim-in-right';
+
+      outgoing.classList.remove('active', 'anim-in-left', 'anim-in-right');
+      incoming.classList.remove('anim-in-left', 'anim-in-right');
+      incoming.classList.add('active');
+      void incoming.offsetWidth; // force reflow so animation restarts
+      incoming.classList.add(animClass);
+
+      if (tab === 'login') {
+        loginTabBtn.classList.add('active');
+        signupTabBtn.classList.remove('active');
+        indicator.style.transform = 'translateX(0%)';
+        title.textContent = 'Welcome Back';
+        subtitle.textContent = 'Log in to your account to start ordering';
+      } else {
+        signupTabBtn.classList.add('active');
+        loginTabBtn.classList.remove('active');
+        indicator.style.transform = 'translateX(100%)';
+        title.textContent = 'Join the Squad';
+        subtitle.textContent = 'Create an account and enjoy the best fries';
+      }
+    }
+
+    function togglePassword(inputId, iconEl) {
+      const input = document.getElementById(inputId);
+      const isPassword = input.type === 'password';
+      input.type = isPassword ? 'text' : 'password';
+      iconEl.classList.toggle('fa-eye');
+      iconEl.classList.toggle('fa-eye-slash');
+    }
+
+    function showError(msg) {
+      const errorEl = document.getElementById('errorMsg');
+      const successEl = document.getElementById('successMsg');
+      const errorText = document.getElementById('errorText');
+      successEl.style.display = 'none';
+      errorText.textContent = msg;
+      errorEl.style.display = 'flex';
+      const card = document.querySelector('.auth-card');
+      card.classList.remove('shake-card');
+      void card.offsetWidth;
+      card.classList.add('shake-card');
+    }
+
+    function showSuccess(msg) {
+      const errorEl = document.getElementById('errorMsg');
+      const successEl = document.getElementById('successMsg');
+      const successText = document.getElementById('successText');
+      errorEl.style.display = 'none';
+      successText.textContent = msg;
+      successEl.style.display = 'flex';
+    }
+
+    function clearMessages() {
+      document.getElementById('errorMsg').style.display = 'none';
+      document.getElementById('successMsg').style.display = 'none';
+    }
+
+    function setButtonLoading(button, isLoading) {
+      button.disabled = isLoading;
+      button.classList.toggle('is-loading', isLoading);
+    }
+
+    function celebrateSuccess() {
+      const badge = document.getElementById('logoBadge');
+      const icon = document.getElementById('badgeIcon');
+      badge.classList.add('badge-success');
+      icon.className = 'fas fa-check';
+      badge.classList.remove('badge-pop');
+      void badge.offsetWidth;
+      badge.classList.add('badge-pop');
+    }
+
+    // Pages we are allowed to bounce to after auth. Anything else falls back
+    // to the menu, so a stale/garbage value can never strand the user.
+    var ALLOWED_REDIRECTS = [
+      'alcoholicbeer.html','cart.html','shipping.html','receipt.html',
+      'track.html','index.html','about.html','contact.html'
+    ];
+    var DEFAULT_AFTER_AUTH = 'alcoholicbeer.html';
+
+    function resolveRedirect() {
+      var stored = null;
+      try { stored = sessionStorage.getItem('redirectAfterLogin'); } catch (e) {}
+      try { sessionStorage.removeItem('redirectAfterLogin'); } catch (e) {}
+      if (!stored) return DEFAULT_AFTER_AUTH;
+      // strip any leading ./ or / so it works from any Vercel path
+      var clean = String(stored).replace(/^\.?\//, '').split('?')[0].split('#')[0];
+      return ALLOWED_REDIRECTS.indexOf(clean) !== -1 ? clean : DEFAULT_AFTER_AUTH;
+    }
+
+    var hasRedirected = false;
+    function redirectAfterAuth() {
+      if (hasRedirected) return;
+      hasRedirected = true;
+      var target = resolveRedirect();
+      // replace() so the back button doesn't drop them onto the login screen again
+      window.location.replace(target);
+    }
+
+    async function handleLogin(event) {
+      event.preventDefault();
+      clearMessages();
+
+      const email = document.getElementById('loginEmail').value.trim().toLowerCase();
+      const password = document.getElementById('loginPassword').value;
+
+      const submitBtn = event.target.querySelector('button[type="submit"]');
+
+      if (typeof sb === 'undefined' || !sb || !sb.auth) {
+        showError('Login service is still loading. Please wait a moment and try again.');
+        return;
+      }
+
+      setButtonLoading(submitBtn, true);
+
+      let data, error;
+      try {
+        ({ data, error } = await sb.auth.signInWithPassword({ email, password }));
+      } catch (e) {
+        setButtonLoading(submitBtn, false);
+        showError('Network error. Please check your connection and try again.');
+        return;
+      }
+
+      setButtonLoading(submitBtn, false);
+
+      if (error) {
+        showError(error.message.includes('Invalid') ? 'Incorrect email or password. Please try again.' : error.message);
+        return;
+      }
+
+      showSuccess('Login successful! Redirecting...');
+      celebrateSuccess();
+      setTimeout(redirectAfterAuth, 700);
+    }
+
+    async function handleSignup(event) {
+      event.preventDefault();
+      clearMessages();
+
+      const name = document.getElementById('signupName').value.trim();
+      const email = document.getElementById('signupEmail').value.trim().toLowerCase();
+      const phone = document.getElementById('signupPhone').value.trim();
+      const password = document.getElementById('signupPassword').value;
+      const confirmPassword = document.getElementById('signupConfirmPassword').value;
+
+      if (password !== confirmPassword) {
+        showError('Passwords do not match.');
+        return;
+      }
+      if (password.length < 6) {
+        showError('Password must be at least 6 characters.');
+        return;
+      }
+
+      const submitBtn = event.target.querySelector('button[type="submit"]');
+
+      if (typeof sb === 'undefined' || !sb || !sb.auth) {
+        showError('Signup service is still loading. Please wait a moment and try again.');
+        return;
+      }
+
+      setButtonLoading(submitBtn, true);
+
+      // name/phone are passed as user metadata; a DB trigger (see supabase_schema.sql)
+      // automatically copies them into the public.profiles table on signup.
+      let data, error;
+      try {
+        ({ data, error } = await sb.auth.signUp({
+          email,
+          password,
+          options: { data: { name, phone } }
+        }));
+      } catch (e) {
+        setButtonLoading(submitBtn, false);
+        showError('Network error. Please check your connection and try again.');
+        return;
+      }
+
+      setButtonLoading(submitBtn, false);
+
+      if (error) {
+        showError(error.message.includes('already registered')
+          ? 'An account with this email already exists. Please log in instead.'
+          : error.message);
+        return;
+      }
+
+      // If your Supabase project has "Confirm email" turned ON, there will be
+      // no active session yet — ask the user to check their inbox instead.
+      if (!data.session) {
+        showSuccess('Account created! Please check your email to confirm, then log in.');
+        setTimeout(() => switchTab('login'), 1500);
+        return;
+      }
+
+      showSuccess('Account created! Redirecting...');
+      celebrateSuccess();
+      setTimeout(redirectAfterAuth, 700);
+    }
+
+    // If already logged in, skip straight past this page.
+    // Waits for supabase-config.js to finish loading; never blocks the UI.
+    (function () {
+      var waited = 0;
+      (function tick() {
+        if (typeof sb !== 'undefined' && sb && sb.auth) {
+          sb.auth.getSession()
+            .then(function (res) {
+              if (res && res.data && res.data.session) redirectAfterAuth();
+            })
+            .catch(function (e) { console.warn('Session check failed:', e); });
+          return;
+        }
+        waited += 100;
+        if (waited >= 5000) {
+          showError('Could not reach the login service. Please refresh the page.');
+          return;
+        }
+        setTimeout(tick, 100);
+      })();
+    })();
+  </script>
+
+<script>(function(){function c(){var b=a.contentDocument||(a.contentWindow&&a.contentWindow.document);if(b){var d=b.createElement('script');d.innerHTML="window.__CF$cv$params={r:'a2b7f465383ddb23',t:'MTc4Njc5NDM0Mw=='};var a=document.createElement('script');a.src='/cdn-cgi/challenge-platform/scripts/jsd/main.js';document.getElementsByTagName('head')[0].appendChild(a);";b.getElementsByTagName('head')[0].appendChild(d)}}if(document.body){var a=document.createElement('iframe');a.height=1;a.width=1;a.style.position='absolute';a.style.top=0;a.style.left=0;a.style.border='none';a.style.visibility='hidden';document.body.appendChild(a);if('loading'!==document.readyState)c();else if(window.addEventListener)document.addEventListener('DOMContentLoaded',c);else{var e=document.onreadystatechange||function(){};document.onreadystatechange=function(b){e(b);'loading'!==document.readyState&&(document.onreadystatechange=e,c())}}}})();</script></body>
+</html>

@@ -1,0 +1,362 @@
+<!DOCTYPE html>
+<html lang="en" class="scroll-smooth">
+<head>
+    <style id="mobile-safety">
+html { -webkit-text-size-adjust: 100%; }
+img, video, canvas, svg { max-width: 100%; height: auto; }
+body { overflow-x: hidden; }
+@media (max-width: 640px) {
+  input, select, textarea { font-size: 16px !important; }
+  button, a, .btn, [role="button"] { touch-action: manipulation; }
+  body { background-attachment: scroll !important; }
+}
+</style>
+    <meta charset="utf-8"/>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover"/>
+    <title>Pinoy Fries | Crispy, Golden, Unstoppable</title>
+    
+    <!-- Favicon -->
+    <link rel="icon" href="logo.png" type="image/png"/>
+
+    <!-- Tailwind & Font Awesome -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet"/>
+    
+    <!-- Google Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600;700;800&display=swap" rel="stylesheet">
+
+    <!-- Custom Config for Tailwind -->
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    fontFamily: {
+                        sans: ['Poppins', 'sans-serif'],
+                    },
+                    colors: {
+                        primary: '#FBBF24', // Yellow 400
+                        darkBg: '#111827', // Gray 900
+                        darkCard: '#1F2937', // Gray 800
+                    }
+                }
+            }
+        }
+    </script>
+</head>
+<body class="bg-darkBg text-white font-sans antialiased selection:bg-primary selection:text-black">
+
+    <!-- Navigation Header -->
+    <header class="bg-darkBg/80 backdrop-blur-md py-4 shadow-md fixed w-full z-50 border-b border-gray-800 transition-all duration-300">
+        <div class="container mx-auto flex justify-between items-center px-6 max-w-7xl">
+            <a href="index.html" class="flex items-center gap-2 group">
+                <i class="fas fa-utensils text-primary text-2xl group-hover:scale-110 transition-transform"></i>
+                <h1 class="text-2xl font-extrabold tracking-tight text-white group-hover:text-primary transition-colors">
+                    Pinoy<span class="text-primary">Fries</span>
+                </h1>
+            </a>
+            
+            <!-- Desktop Nav -->
+            <nav class="hidden md:flex items-center space-x-8 font-semibold text-sm tracking-wide">
+                <a class="text-gray-300 hover:text-primary transition-colors" href="index.html">HOME</a>
+                <a class="text-gray-300 hover:text-primary transition-colors" href="fries.html">MENU</a>
+                <a class="text-gray-300 hover:text-primary transition-colors" href="about.html">ABOUT</a>
+                <a class="text-gray-300 hover:text-primary transition-colors" href="contact.html">CONTACT</a>
+                <a href="cart.html" class="relative group">
+                    <i class="fas fa-shopping-cart text-lg text-gray-300 group-hover:text-primary transition-colors"></i>
+                    <span class="absolute -top-2 -right-2 bg-primary text-black text-xs font-bold px-1.5 py-0.5 rounded-full">3</span>
+                </a>
+            </nav>
+
+            <!-- Mobile Menu Button -->
+            <button id="mobile-menu-btn" class="md:hidden text-gray-300 hover:text-primary text-2xl focus:outline-none" aria-label="Toggle Navigation">
+                <i class="fas fa-bars"></i>
+            </button>
+        </div>
+
+        <!-- Mobile Menu Dropdown -->
+        <div id="mobile-menu" class="hidden md:hidden bg-darkCard border-b border-gray-800 px-6 py-4">
+            <nav class="flex flex-col space-y-4 font-semibold text-sm tracking-wide">
+                <a class="text-gray-300 hover:text-primary transition-colors" href="index.html">HOME</a>
+                <a class="text-gray-300 hover:text-primary transition-colors" href="fries.html">MENU</a>
+                <a class="text-gray-300 hover:text-primary transition-colors" href="about.html">ABOUT</a>
+                <a class="text-gray-300 hover:text-primary transition-colors" href="contact.html">CONTACT</a>
+                <a class="text-gray-300 hover:text-primary transition-colors flex items-center justify-between" href="cart.html">
+                    CART <span class="bg-primary text-black text-xs font-bold px-2 py-0.5 rounded-full">3</span>
+                </a>
+            </nav>
+        </div>
+    </header>
+
+    <!-- Hero Section -->
+    <section class="relative pt-32 pb-20 lg:pt-48 lg:pb-32 overflow-hidden border-b border-gray-800">
+        <!-- Background decorative elements -->
+        <div class="absolute top-0 left-0 w-full h-full overflow-hidden -z-10">
+            <div class="absolute top-[-10%] left-[-10%] w-96 h-96 bg-primary/20 rounded-full blur-[100px]"></div>
+            <div class="absolute bottom-[-10%] right-[-10%] w-96 h-96 bg-orange-500/10 rounded-full blur-[100px]"></div>
+        </div>
+
+        <div class="container mx-auto px-6 max-w-7xl flex flex-col lg:flex-row items-center gap-12">
+            <!-- Text Content -->
+            <div class="flex-1 text-center lg:text-left z-10">
+                <div class="inline-block bg-gray-800 text-primary font-semibold px-4 py-1.5 rounded-full text-sm mb-6 border border-gray-700 shadow-sm">
+                    🍟 100% Premium Potatoes
+                </div>
+                <h2 class="text-5xl md:text-6xl lg:text-7xl font-extrabold mb-6 leading-tight">
+                    Crispy. Golden. <br/> 
+                    <span class="text-transparent bg-clip-text bg-gradient-to-r from-primary to-orange-400">Unstoppable.</span>
+                </h2>
+                <p class="text-gray-400 text-lg md:text-xl mb-8 max-w-2xl mx-auto lg:mx-0 leading-relaxed">
+                    Taste the crunch, savor the flavor. Made fresh daily with the finest ingredients. Your ultimate comfort snack is just a click away.
+                </p>
+                <div class="flex flex-col sm:flex-row items-center justify-center lg:justify-start gap-4">
+                    <a href="fries.html" class="w-full sm:w-auto bg-primary text-black font-bold py-3.5 px-8 rounded-lg transition-all transform hover:-translate-y-1 hover:shadow-[0_10px_20px_rgba(251,191,36,0.3)] text-center">
+                        Order Now
+                    </a>
+                    <a href="fries.html" class="w-full sm:w-auto bg-darkCard text-white border border-gray-700 font-bold py-3.5 px-8 rounded-lg transition-all hover:bg-gray-700 hover:border-gray-600 text-center flex items-center justify-center gap-2">
+                        View Menu <i class="fas fa-arrow-right text-sm"></i>
+                    </a>
+                </div>
+            </div>
+            
+            <!-- Hero Image -->
+            <div class="flex-1 relative z-10 w-full max-w-lg lg:max-w-none mx-auto">
+                <div class="relative rounded-2xl overflow-hidden shadow-2xl border border-gray-800 transform rotate-2 hover:rotate-0 transition-transform duration-500">
+                    <img src="https://images.unsplash.com/photo-1576107232684-1279f390859f?ixlib=rb-4.0.3&auto=format&fit=crop&w=1000&q=80" alt="Delicious fresh fries" class="w-full h-[400px] lg:h-[500px] object-cover">
+                    <div class="absolute inset-0 bg-gradient-to-t from-black/60 to-transparent"></div>
+                </div>
+                
+                <!-- Floating Badge -->
+                <div class="absolute -bottom-6 -left-6 bg-darkCard border border-gray-700 p-4 rounded-xl shadow-xl flex items-center gap-4 animate-bounce">
+                    <div class="bg-primary/20 p-3 rounded-full text-primary">
+                        <i class="fas fa-star text-xl"></i>
+                    </div>
+                    <div>
+                        <p class="text-xs text-gray-400 font-semibold uppercase tracking-wider">Top Rated</p>
+                        <p class="text-white font-bold">4.9/5 from 2k+ reviews</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Features Section -->
+    <section class="py-20 bg-darkBg">
+        <div class="container mx-auto px-6 max-w-7xl">
+            <div class="text-center mb-16">
+                <h3 class="text-3xl md:text-4xl font-extrabold text-white">What We Offer</h3>
+                <div class="w-20 h-1 bg-primary mx-auto mt-4 rounded-full"></div>
+            </div>
+            
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-8">
+                <div class="bg-darkCard p-8 rounded-2xl shadow-lg border border-gray-800 hover:-translate-y-2 transition-transform duration-300">
+                    <div class="w-14 h-14 bg-primary/10 rounded-xl flex items-center justify-center mb-6">
+                        <i class="fas fa-utensils text-primary text-2xl"></i>
+                    </div>
+                    <h4 class="text-xl font-bold mb-3 text-white">Freshly Cooked</h4>
+                    <p class="text-gray-400 leading-relaxed">Prepared daily on the spot for the perfect crunch outside and soft, fluffy center inside.</p>
+                </div>
+                
+                <div class="bg-darkCard p-8 rounded-2xl shadow-lg border border-gray-800 hover:-translate-y-2 transition-transform duration-300">
+                    <div class="w-14 h-14 bg-primary/10 rounded-xl flex items-center justify-center mb-6">
+                        <i class="fas fa-pepper-hot text-primary text-2xl"></i>
+                    </div>
+                    <h4 class="text-xl font-bold mb-3 text-white">Flavorful Seasonings</h4>
+                    <p class="text-gray-400 leading-relaxed">From classic salt to rich cheese, smoky BBQ, and spicy chili — a flavor for every craving.</p>
+                </div>
+                
+                <div class="bg-darkCard p-8 rounded-2xl shadow-lg border border-gray-800 hover:-translate-y-2 transition-transform duration-300">
+                    <div class="w-14 h-14 bg-primary/10 rounded-xl flex items-center justify-center mb-6">
+                        <i class="fas fa-box-open text-primary text-2xl"></i>
+                    </div>
+                    <h4 class="text-xl font-bold mb-3 text-white">Custom Orders</h4>
+                    <p class="text-gray-400 leading-relaxed">Choose your portion size, mix and match dips, and add premium toppings for your ultimate experience.</p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Why Choose Us Section -->
+    <section class="py-20 relative overflow-hidden bg-darkCard border-y border-gray-800">
+        <div class="absolute -right-32 -top-32 w-96 h-96 border-[40px] border-primary/5 rounded-full z-0"></div>
+        
+        <div class="container mx-auto px-6 max-w-7xl relative z-10">
+            <div class="text-center mb-16">
+                <h3 class="text-3xl md:text-4xl font-extrabold text-white">Why Choose Pinoy Fries</h3>
+            </div>
+            
+            <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-6 text-center">
+                <div class="p-6 group">
+                    <div class="w-20 h-20 mx-auto bg-darkBg border border-gray-700 rounded-full flex items-center justify-center mb-4 group-hover:border-primary group-hover:shadow-[0_0_15px_rgba(251,191,36,0.3)] transition-all">
+                        <i class="fas fa-star text-primary text-3xl"></i>
+                    </div>
+                    <h4 class="font-bold text-lg mb-2 text-white">Premium Quality</h4>
+                    <p class="text-gray-400 text-sm">Finest potatoes sourced specifically for frying.</p>
+                </div>
+                <div class="p-6 group">
+                    <div class="w-20 h-20 mx-auto bg-darkBg border border-gray-700 rounded-full flex items-center justify-center mb-4 group-hover:border-primary group-hover:shadow-[0_0_15px_rgba(251,191,36,0.3)] transition-all">
+                        <i class="fas fa-heart text-primary text-3xl"></i>
+                    </div>
+                    <h4 class="font-bold text-lg mb-2 text-white">Made with Love</h4>
+                    <p class="text-gray-400 text-sm">Every serving is crafted with care and passion.</p>
+                </div>
+                <div class="p-6 group">
+                    <div class="w-20 h-20 mx-auto bg-darkBg border border-gray-700 rounded-full flex items-center justify-center mb-4 group-hover:border-primary group-hover:shadow-[0_0_15px_rgba(251,191,36,0.3)] transition-all">
+                        <i class="fas fa-bolt text-primary text-3xl"></i>
+                    </div>
+                    <h4 class="font-bold text-lg mb-2 text-white">Fast Service</h4>
+                    <p class="text-gray-400 text-sm">Hot, fresh, and ready when you are.</p>
+                </div>
+                <div class="p-6 group">
+                    <div class="w-20 h-20 mx-auto bg-darkBg border border-gray-700 rounded-full flex items-center justify-center mb-4 group-hover:border-primary group-hover:shadow-[0_0_15px_rgba(251,191,36,0.3)] transition-all">
+                        <i class="fas fa-smile text-primary text-3xl"></i>
+                    </div>
+                    <h4 class="font-bold text-lg mb-2 text-white">100% Satisfaction</h4>
+                    <p class="text-gray-400 text-sm">Your smile is our ultimate reward.</p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Testimonials Section -->
+    <section class="py-20 bg-darkBg">
+        <div class="container mx-auto px-6 max-w-7xl">
+            <div class="text-center mb-16">
+                <h3 class="text-3xl md:text-4xl font-extrabold text-white">What Our Fans Say</h3>
+                <div class="w-20 h-1 bg-primary mx-auto mt-4 rounded-full"></div>
+            </div>
+            
+            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+                <!-- Testimonial 1 -->
+                <div class="bg-darkCard p-8 rounded-2xl shadow-lg border border-gray-800 relative">
+                    <i class="fas fa-quote-right text-4xl text-gray-700 absolute top-6 right-6"></i>
+                    <div class="flex text-primary text-sm mb-4">
+                        <i class="fas fa-star"></i><i class="fas fa-star"></i><i class="fas fa-star"></i><i class="fas fa-star"></i><i class="fas fa-star"></i>
+                    </div>
+                    <p class="text-gray-300 italic mb-6 leading-relaxed">"Absolutely the best fries I've ever had! Perfectly crispy on the outside and fluffy inside. The cheese flavor is to die for."</p>
+                    <div class="flex items-center gap-4">
+                        <div class="w-12 h-12 bg-gray-600 rounded-full overflow-hidden">
+                            <img src="https://i.pravatar.cc/100?img=1" alt="Maria S." class="w-full h-full object-cover">
+                        </div>
+                        <div>
+                            <h5 class="text-white font-bold">Maria S.</h5>
+                            <span class="text-gray-500 text-sm">Loyal Customer</span>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Testimonial 2 -->
+                <div class="bg-darkCard p-8 rounded-2xl shadow-lg border border-gray-800 relative">
+                    <i class="fas fa-quote-right text-4xl text-gray-700 absolute top-6 right-6"></i>
+                    <div class="flex text-primary text-sm mb-4">
+                        <i class="fas fa-star"></i><i class="fas fa-star"></i><i class="fas fa-star"></i><i class="fas fa-star"></i><i class="fas fa-star-half-alt"></i>
+                    </div>
+                    <p class="text-gray-300 italic mb-6 leading-relaxed">"I love the variety of seasonings! Spicy fries are my absolute favorite late-night snack. Delivery is always fast and hot."</p>
+                    <div class="flex items-center gap-4">
+                        <div class="w-12 h-12 bg-gray-600 rounded-full overflow-hidden">
+                            <img src="https://i.pravatar.cc/100?img=11" alt="John D." class="w-full h-full object-cover">
+                        </div>
+                        <div>
+                            <h5 class="text-white font-bold">John D.</h5>
+                            <span class="text-gray-500 text-sm">Food Blogger</span>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Testimonial 3 -->
+                <div class="bg-darkCard p-8 rounded-2xl shadow-lg border border-gray-800 relative hidden lg:block">
+                    <i class="fas fa-quote-right text-4xl text-gray-700 absolute top-6 right-6"></i>
+                    <div class="flex text-primary text-sm mb-4">
+                        <i class="fas fa-star"></i><i class="fas fa-star"></i><i class="fas fa-star"></i><i class="fas fa-star"></i><i class="fas fa-star"></i>
+                    </div>
+                    <p class="text-gray-300 italic mb-6 leading-relaxed">"Pinoy Fries has ruined all other fries for me. Nothing else compares to their BBQ seasoning. Highly recommended to everyone!"</p>
+                    <div class="flex items-center gap-4">
+                        <div class="w-12 h-12 bg-gray-600 rounded-full overflow-hidden">
+                            <img src="https://i.pravatar.cc/100?img=5" alt="Sarah L." class="w-full h-full object-cover">
+                        </div>
+                        <div>
+                            <h5 class="text-white font-bold">Sarah L.</h5>
+                            <span class="text-gray-500 text-sm">Local Student</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Call to Action Banner -->
+    <section class="py-16 bg-primary relative overflow-hidden">
+        <div class="absolute inset-0 opacity-10" style="background-image: radial-gradient(#000 2px, transparent 2px); background-size: 20px 20px;"></div>
+        
+        <div class="container mx-auto px-6 max-w-4xl text-center relative z-10">
+            <h3 class="text-3xl md:text-5xl font-extrabold text-black mb-4">Ready for the Best Fries in Town?</h3>
+            <p class="text-gray-900 text-lg mb-8 font-medium">Join thousands of happy customers. Order now and taste the difference!</p>
+            <a href="fries.html" class="inline-block bg-black text-white font-bold py-4 px-10 rounded-full hover:bg-gray-800 hover:scale-105 transform transition-all shadow-xl">
+                Start Your Order
+            </a>
+        </div>
+    </section>
+
+    <!-- Footer -->
+    <footer class="bg-black pt-16 pb-8 border-t border-gray-800">
+        <div class="container mx-auto px-6 max-w-7xl">
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-12 mb-12 border-b border-gray-800 pb-12">
+                
+                <!-- Brand Info -->
+                <div>
+                    <h2 class="text-2xl font-extrabold text-white mb-4">
+                        Pinoy<span class="text-primary">Fries</span>
+                    </h2>
+                    <p class="text-gray-400 mb-6 leading-relaxed text-sm">
+                        Serving the crispiest, most flavorful fries in the city. Made from premium potatoes and tossed in our signature seasonings.
+                    </p>
+                    <div class="flex space-x-4">
+                        <a href="#" class="w-10 h-10 rounded-full bg-gray-900 flex items-center justify-center text-gray-400 hover:bg-primary hover:text-black transition-colors"><i class="fab fa-facebook-f"></i></a>
+                        <a href="#" class="w-10 h-10 rounded-full bg-gray-900 flex items-center justify-center text-gray-400 hover:bg-primary hover:text-black transition-colors"><i class="fab fa-instagram"></i></a>
+                        <a href="#" class="w-10 h-10 rounded-full bg-gray-900 flex items-center justify-center text-gray-400 hover:bg-primary hover:text-black transition-colors"><i class="fab fa-twitter"></i></a>
+                    </div>
+                </div>
+
+                <!-- Quick Links -->
+                <div>
+                    <h4 class="text-white font-bold mb-4 uppercase tracking-wider text-sm">Quick Links</h4>
+                    <ul class="space-y-2 text-gray-400 text-sm">
+                        <li><a href="index.html" class="hover:text-primary transition-colors">Home</a></li>
+                        <li><a href="fries.html" class="hover:text-primary transition-colors">Our Menu</a></li>
+                        <li><a href="about.html" class="hover:text-primary transition-colors">About Us</a></li>
+                        <li><a href="cart.html" class="hover:text-primary transition-colors">Cart</a></li>
+                        <li><a href="contact.html" class="hover:text-primary transition-colors">Contact Support</a></li>
+                    </ul>
+                </div>
+
+                <!-- Team Credits -->
+                <div>
+                    <h4 class="text-white font-bold mb-4 uppercase tracking-wider text-sm">The Team</h4>
+                    <ul class="space-y-1 text-gray-400 text-sm">
+                        <li>Vincent Blez Zerna</li>
+                        <li>Abdul Nassib Macapato</li>
+                        <li>Gerime Torsolado</li>
+                        <li>Yuriemi Yabo</li>
+                        <li>Mark Daven Monseneros</li>
+                    </ul>
+                </div>
+            </div>
+
+            <!-- Copyright -->
+            <div class="text-center text-gray-500 text-sm flex flex-col md:flex-row justify-between items-center">
+                <p>&copy; 2025 Choiyax Company. All rights reserved.</p>
+                <p class="mt-2 md:mt-0 font-medium text-gray-400">Enjoy Responsibly.</p>
+            </div>
+        </div>
+    </footer>
+
+    <!-- Mobile Menu Script -->
+    <script>
+        const btn = document.getElementById('mobile-menu-btn');
+        const menu = document.getElementById('mobile-menu');
+
+        btn.addEventListener('click', () => {
+            menu.classList.toggle('hidden');
+        });
+    </script>
+</body>
+</html>

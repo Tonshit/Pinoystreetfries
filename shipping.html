@@ -1,0 +1,1125 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Pinoy Fries | Secure Checkout</title>
+    <link rel="icon" href="logo.png" type="image/png">
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet"/>
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <script src="supabase-config.js"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;600;700;800;900&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --primary: #FF9F1C;
+            --primary-dark: #E76F51;
+            --secondary: #2EC4B6;
+            --accent: #FFBF69;
+            --bg-dark: #020617;
+        }
+
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+
+        body {
+            font-family: 'Plus Jakarta Sans', sans-serif;
+            background-color: var(--bg-dark);
+            background-image: url('https://img.freepik.com/free-photo/crispy-golden-french-fries-with-falling-seasoning_84443-75181.jpg?semt=ais_rp_50_assets&w=740&q=80');
+            background-size: cover;
+            background-position: center;
+            background-attachment: fixed;
+            color: #f8fafc;
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            overflow-x: hidden;
+        }
+
+        body::before {
+            content: '';
+            position: fixed;
+            top: 0; left: 0; right: 0; bottom: 0;
+            background: linear-gradient(180deg, rgba(2, 6, 23, 0.93) 0%, rgba(2, 6, 23, 0.88) 50%, rgba(2, 6, 23, 0.95) 100%);
+            z-index: -1;
+        }
+
+        /* ===== FLOATING DECORATIVE ELEMENTS ===== */
+        .floating-element {
+            position: fixed;
+            pointer-events: none;
+            z-index: 0;
+            opacity: 0;
+            animation: floatIn 1s ease forwards;
+        }
+
+        .floating-element .icon {
+            font-size: 2rem;
+            filter: drop-shadow(0 0 10px rgba(255, 159, 28, 0.3));
+            animation: floatBounce 6s ease-in-out infinite;
+        }
+
+        .floating-element:nth-child(1) { top: 15%; left: 5%; animation-delay: 0.5s; }
+        .floating-element:nth-child(2) { top: 60%; left: 8%; animation-delay: 1.2s; }
+        .floating-element:nth-child(3) { top: 25%; right: 5%; animation-delay: 0.8s; }
+        .floating-element:nth-child(4) { top: 75%; right: 8%; animation-delay: 1.5s; }
+        .floating-element:nth-child(5) { top: 45%; left: 3%; animation-delay: 2s; }
+        .floating-element:nth-child(6) { top: 85%; left: 15%; animation-delay: 1.8s; }
+
+        @keyframes floatIn {
+            0% { opacity: 0; transform: translateY(40px) rotate(-10deg); }
+            100% { opacity: 0.15; transform: translateY(0) rotate(0deg); }
+        }
+
+        @keyframes floatBounce {
+            0%, 100% { transform: translateY(0) rotate(-5deg); }
+            25% { transform: translateY(-15px) rotate(5deg); }
+            50% { transform: translateY(-8px) rotate(-3deg); }
+            75% { transform: translateY(-20px) rotate(3deg); }
+        }
+
+        /* ===== NAVBAR ===== */
+        .glass {
+            background: rgba(15, 23, 42, 0.85);
+            backdrop-filter: blur(24px);
+            -webkit-backdrop-filter: blur(24px);
+            border-bottom: 1px solid rgba(255, 255, 255, 0.06);
+        }
+
+        .nav-item {
+            position: relative;
+            overflow: hidden;
+        }
+
+        .nav-item::after {
+            content: '';
+            position: absolute;
+            bottom: -2px;
+            left: 50%;
+            width: 0;
+            height: 2px;
+            background: linear-gradient(90deg, var(--primary), var(--primary-dark));
+            transition: all 0.3s ease;
+            transform: translateX(-50%);
+            border-radius: 2px;
+        }
+
+        .nav-item:hover::after {
+            width: 100%;
+        }
+
+        .nav-logo {
+            animation: logoPulse 3s ease-in-out infinite;
+        }
+
+        @keyframes logoPulse {
+            0%, 100% { box-shadow: 0 0 0 0 rgba(255, 159, 28, 0.4); }
+            50% { box-shadow: 0 0 20px 4px rgba(255, 159, 28, 0.2); }
+        }
+
+        /* ===== MAIN CARD ===== */
+        .main-card {
+            background: linear-gradient(165deg, #0f172a 0%, #1e1b2e 50%, #0f172a 100%);
+            border: 1px solid rgba(255, 255, 255, 0.08);
+            box-shadow: 
+                0 25px 60px -12px rgba(0, 0, 0, 0.7),
+                0 0 80px -20px rgba(255, 159, 28, 0.08);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .main-card::before {
+            content: '';
+            position: absolute;
+            top: -1px;
+            left: 0;
+            right: 0;
+            height: 2px;
+            background: linear-gradient(90deg, transparent, var(--primary), var(--accent), var(--primary), transparent);
+            opacity: 0.6;
+        }
+
+        .main-card::after {
+            content: '';
+            position: absolute;
+            top: 0;
+            right: 0;
+            width: 300px;
+            height: 300px;
+            background: radial-gradient(circle, rgba(255, 159, 28, 0.04) 0%, transparent 70%);
+            pointer-events: none;
+        }
+
+        /* ===== ENTRANCE ANIMATIONS ===== */
+        @keyframes slideUpFade {
+            from { opacity: 0; transform: translateY(50px) scale(0.97); }
+            to { opacity: 1; transform: translateY(0) scale(1); }
+        }
+
+        @keyframes slideDownFade {
+            from { opacity: 0; transform: translateY(-30px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        @keyframes slideInLeft {
+            from { opacity: 0; transform: translateX(-40px); }
+            to { opacity: 1; transform: translateX(0); }
+        }
+
+        @keyframes slideInRight {
+            from { opacity: 0; transform: translateX(40px); }
+            to { opacity: 1; transform: translateX(0); }
+        }
+
+        @keyframes scaleIn {
+            from { opacity: 0; transform: scale(0.8); }
+            to { opacity: 1; transform: scale(1); }
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; }
+            to { opacity: 1; }
+        }
+
+        .animate-card {
+            animation: slideUpFade 0.8s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+        }
+
+        .animate-nav {
+            animation: slideDownFade 0.6s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+        }
+
+        .animate-field {
+            opacity: 0;
+            animation: slideInRight 0.5s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+        }
+
+        .animate-field:nth-child(1) { animation-delay: 0.3s; }
+        .animate-field:nth-child(2) { animation-delay: 0.45s; }
+        .animate-field:nth-child(3) { animation-delay: 0.6s; }
+        .animate-field:nth-child(4) { animation-delay: 0.75s; }
+
+        .animate-submit {
+            opacity: 0;
+            animation: scaleIn 0.5s cubic-bezier(0.34, 1.56, 0.64, 1) forwards;
+            animation-delay: 0.9s;
+        }
+
+        .animate-welcome {
+            opacity: 0;
+            animation: slideInLeft 0.6s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+            animation-delay: 0.2s;
+        }
+
+        .animate-title {
+            opacity: 0;
+            animation: slideInLeft 0.5s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+            animation-delay: 0.15s;
+        }
+
+        .animate-subtitle {
+            opacity: 0;
+            animation: fadeIn 0.5s ease forwards;
+            animation-delay: 0.35s;
+        }
+
+        /* ===== SIDE IMAGE ===== */
+        .side-image {
+            background: linear-gradient(rgba(15, 23, 42, 0.5), rgba(15, 23, 42, 0.8)),
+                        url('https://images.stockcake.com/public/2/a/b/2abfad8d-31a4-49c2-92fb-5ec6571e2f35_large/flying-fries-fest-stockcake.jpg');
+            background-size: cover;
+            background-position: center;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .side-image::before {
+            content: '';
+            position: absolute;
+            inset: 0;
+            background: linear-gradient(135deg, rgba(255, 159, 28, 0.1) 0%, transparent 50%);
+            animation: shimmer 4s ease-in-out infinite;
+        }
+
+        @keyframes shimmer {
+            0%, 100% { opacity: 0.5; }
+            50% { opacity: 1; }
+        }
+
+        .side-image .brand-content {
+            opacity: 0;
+            animation: slideInLeft 0.7s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+            animation-delay: 0.5s;
+        }
+
+        .side-image .brand-badge {
+            opacity: 0;
+            animation: scaleIn 0.5s cubic-bezier(0.34, 1.56, 0.64, 1) forwards;
+            animation-delay: 0.7s;
+        }
+
+        /* ===== INPUT FIELDS ===== */
+        .input-field {
+            background: rgba(30, 41, 59, 0.8);
+            border: 2px solid rgba(51, 65, 85, 0.6);
+            color: white;
+            transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+            position: relative;
+        }
+
+        .input-field:focus {
+            background: rgba(30, 41, 59, 1);
+            border-color: var(--primary);
+            box-shadow: 
+                0 0 0 4px rgba(255, 159, 28, 0.12),
+                0 0 20px -4px rgba(255, 159, 28, 0.15);
+            outline: none;
+            transform: translateY(-1px);
+        }
+
+        .input-field:read-only {
+            background: rgba(15, 23, 42, 0.8);
+            color: #64748b;
+            border-color: rgba(30, 41, 59, 0.8);
+            cursor: not-allowed;
+        }
+
+        .input-field::placeholder {
+            color: #475569;
+        }
+
+        /* Animated border glow on focus */
+        .input-group {
+            position: relative;
+        }
+
+        .input-group::after {
+            content: '';
+            position: absolute;
+            inset: -2px;
+            border-radius: inherit;
+            background: linear-gradient(135deg, var(--primary), var(--primary-dark), var(--secondary));
+            opacity: 0;
+            z-index: -1;
+            transition: opacity 0.4s ease;
+            filter: blur(8px);
+        }
+
+        .input-group:focus-within::after {
+            opacity: 0.3;
+        }
+
+        /* ===== BUTTON ===== */
+        .btn-primary {
+            background: linear-gradient(135deg, var(--primary) 0%, var(--primary-dark) 100%);
+            transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+            color: #000;
+            font-weight: 800;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .btn-primary::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.25), transparent);
+            transition: left 0.6s ease;
+        }
+
+        .btn-primary:hover::before {
+            left: 100%;
+        }
+
+        .btn-primary:hover {
+            transform: translateY(-3px);
+            box-shadow: 
+                0 15px 35px -5px rgba(255, 159, 28, 0.4),
+                0 5px 15px -3px rgba(255, 159, 28, 0.2);
+        }
+
+        .btn-primary:active {
+            transform: translateY(-1px) scale(0.98);
+        }
+
+        /* Ripple effect */
+        .ripple {
+            position: absolute;
+            border-radius: 50%;
+            background: rgba(255, 255, 255, 0.3);
+            transform: scale(0);
+            animation: rippleEffect 0.6s linear;
+            pointer-events: none;
+        }
+
+        @keyframes rippleEffect {
+            to { transform: scale(4); opacity: 0; }
+        }
+
+        /* ===== WELCOME BANNER ===== */
+        .welcome-banner {
+            background: linear-gradient(135deg, rgba(255, 159, 28, 0.12) 0%, rgba(231, 111, 81, 0.08) 100%);
+            border: 1px solid rgba(255, 159, 28, 0.25);
+            color: white;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .welcome-banner::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 200%;
+            height: 100%;
+            background: linear-gradient(90deg, transparent, rgba(255, 159, 28, 0.05), transparent);
+            animation: bannerShimmer 3s ease-in-out infinite;
+        }
+
+        @keyframes bannerShimmer {
+            0% { transform: translateX(-50%); }
+            100% { transform: translateX(50%); }
+        }
+
+        /* ===== SELECT ===== */
+        select option {
+            background-color: #0f172a;
+            color: white;
+            padding: 10px;
+        }
+
+        /* ===== LOADER ===== */
+        .loader-container {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 1.5rem;
+        }
+
+        .loader-ring {
+            position: relative;
+            width: 80px;
+            height: 80px;
+        }
+
+        .loader-ring .ring {
+            position: absolute;
+            inset: 0;
+            border-radius: 50%;
+            border: 4px solid transparent;
+        }
+
+        .loader-ring .ring:nth-child(1) {
+            border-top-color: var(--primary);
+            animation: spin 1s linear infinite;
+        }
+
+        .loader-ring .ring:nth-child(2) {
+            inset: 6px;
+            border-right-color: var(--secondary);
+            animation: spin 1.5s linear infinite reverse;
+        }
+
+        .loader-ring .ring:nth-child(3) {
+            inset: 12px;
+            border-bottom-color: var(--accent);
+            animation: spin 2s linear infinite;
+        }
+
+        .loader-ring .fries-icon {
+            position: absolute;
+            inset: 0;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            animation: spin 3s linear infinite;
+        }
+
+        .loader-ring .fries-icon i {
+            font-size: 1.5rem;
+            color: var(--primary);
+            animation: spin 3s linear infinite reverse;
+        }
+
+        .loader-text {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .loader-text .dot {
+            width: 8px;
+            height: 8px;
+            background: var(--primary);
+            border-radius: 50%;
+            animation: dotPulse 1.4s ease-in-out infinite;
+        }
+
+        .loader-text .dot:nth-child(2) { animation-delay: 0.2s; }
+        .loader-text .dot:nth-child(3) { animation-delay: 0.4s; }
+
+        @keyframes dotPulse {
+            0%, 80%, 100% { transform: scale(0.6); opacity: 0.3; }
+            40% { transform: scale(1); opacity: 1; }
+        }
+
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+
+        /* ===== MODAL ===== */
+        .modal-card {
+            background: linear-gradient(165deg, #1e1b2e 0%, #0f172a 100%);
+            border: 1px solid rgba(255, 255, 255, 0.08);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .modal-card::before {
+            content: '';
+            position: absolute;
+            top: -1px;
+            left: 0;
+            right: 0;
+            height: 2px;
+            background: linear-gradient(90deg, transparent, var(--secondary), var(--primary), var(--secondary), transparent);
+        }
+
+        /* Animated checkmark */
+        .checkmark-circle {
+            width: 80px;
+            height: 80px;
+            margin: 0 auto 1.5rem;
+            position: relative;
+        }
+
+        .checkmark-circle svg {
+            width: 80px;
+            height: 80px;
+        }
+
+        .checkmark-circle .circle {
+            stroke: #22c55e;
+            stroke-width: 2;
+            fill: none;
+            stroke-dasharray: 166;
+            stroke-dashoffset: 166;
+            animation: circleDraw 0.6s cubic-bezier(0.65, 0, 0.45, 1) forwards;
+            animation-delay: 0.3s;
+        }
+
+        .checkmark-circle .check {
+            stroke: #22c55e;
+            stroke-width: 3;
+            fill: none;
+            stroke-dasharray: 48;
+            stroke-dashoffset: 48;
+            animation: checkDraw 0.3s cubic-bezier(0.65, 0, 0.45, 1) forwards;
+            animation-delay: 0.7s;
+        }
+
+        @keyframes circleDraw {
+            to { stroke-dashoffset: 0; }
+        }
+
+        @keyframes checkDraw {
+            to { stroke-dashoffset: 0; }
+        }
+
+        /* Confetti */
+        .confetti-container {
+            position: absolute;
+            inset: 0;
+            pointer-events: none;
+            overflow: hidden;
+        }
+
+        .confetti {
+            position: absolute;
+            width: 8px;
+            height: 8px;
+            top: -10px;
+            opacity: 0;
+        }
+
+        .confetti.animate {
+            animation: confettiFall 2.5s ease-out forwards;
+        }
+
+        @keyframes confettiFall {
+            0% { 
+                opacity: 1; 
+                transform: translateY(0) rotate(0deg) scale(1); 
+            }
+            100% { 
+                opacity: 0; 
+                transform: translateY(400px) rotate(720deg) scale(0.5); 
+            }
+        }
+
+        /* Modal entrance */
+        .modal-enter {
+            animation: modalSlideIn 0.5s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+        }
+
+        @keyframes modalSlideIn {
+            from { opacity: 0; transform: scale(0.8) translateY(30px); }
+            to { opacity: 1; transform: scale(1) translateY(0); }
+        }
+
+        /* ===== STEP INDICATOR ===== */
+        .step-indicator {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 0.75rem;
+            margin-bottom: 1.5rem;
+            opacity: 0;
+            animation: fadeIn 0.5s ease forwards;
+            animation-delay: 0.1s;
+        }
+
+        .step {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .step-dot {
+            width: 28px;
+            height: 28px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 0.7rem;
+            font-weight: 800;
+            transition: all 0.3s ease;
+        }
+
+        .step-dot.completed {
+            background: var(--primary);
+            color: #000;
+            box-shadow: 0 0 12px rgba(255, 159, 28, 0.3);
+        }
+
+        .step-dot.active {
+            background: transparent;
+            border: 2px solid var(--primary);
+            color: var(--primary);
+            box-shadow: 0 0 12px rgba(255, 159, 28, 0.2);
+        }
+
+        .step-dot.upcoming {
+            background: rgba(51, 65, 85, 0.5);
+            color: #64748b;
+        }
+
+        .step-line {
+            width: 40px;
+            height: 2px;
+            background: rgba(51, 65, 85, 0.5);
+            border-radius: 2px;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .step-line.completed {
+            background: var(--primary);
+        }
+
+        .step-label {
+            font-size: 0.65rem;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+            color: #64748b;
+        }
+
+        .step-label.active {
+            color: var(--primary);
+        }
+
+        /* ===== GLOWING ORB (background decoration) ===== */
+        .glow-orb {
+            position: fixed;
+            border-radius: 50%;
+            filter: blur(80px);
+            pointer-events: none;
+            z-index: 0;
+        }
+
+        .glow-orb-1 {
+            width: 400px;
+            height: 400px;
+            background: rgba(255, 159, 28, 0.06);
+            top: -100px;
+            right: -100px;
+            animation: orbFloat 8s ease-in-out infinite;
+        }
+
+        .glow-orb-2 {
+            width: 300px;
+            height: 300px;
+            background: rgba(46, 196, 182, 0.04);
+            bottom: -50px;
+            left: -50px;
+            animation: orbFloat 10s ease-in-out infinite reverse;
+        }
+
+        @keyframes orbFloat {
+            0%, 100% { transform: translate(0, 0); }
+            33% { transform: translate(30px, -30px); }
+            66% { transform: translate(-20px, 20px); }
+        }
+
+        /* ===== FORM SECTION TITLE ===== */
+        .section-title {
+            position: relative;
+            display: inline-block;
+        }
+
+        .section-title::after {
+            content: '';
+            position: absolute;
+            bottom: -4px;
+            left: 0;
+            width: 40px;
+            height: 3px;
+            background: linear-gradient(90deg, var(--primary), transparent);
+            border-radius: 3px;
+        }
+
+        /* ===== PARTICLE DOTS ===== */
+        .particle {
+            position: fixed;
+            width: 3px;
+            height: 3px;
+            background: var(--primary);
+            border-radius: 50%;
+            pointer-events: none;
+            z-index: 0;
+            opacity: 0;
+            animation: particleFade 4s ease-in-out infinite;
+        }
+
+        @keyframes particleFade {
+            0%, 100% { opacity: 0; transform: translateY(0); }
+            50% { opacity: 0.3; transform: translateY(-20px); }
+        }
+
+        /* ===== SECURITY BADGE ===== */
+        .security-badge {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 0.5rem;
+            padding: 0.5rem 1rem;
+            background: rgba(34, 197, 94, 0.08);
+            border: 1px solid rgba(34, 197, 94, 0.15);
+            border-radius: 100px;
+            font-size: 0.7rem;
+            font-weight: 600;
+            color: #4ade80;
+            opacity: 0;
+            animation: fadeIn 0.5s ease forwards;
+            animation-delay: 1s;
+        }
+
+        .security-badge i {
+            font-size: 0.65rem;
+        }
+
+        /* ===== RESPONSIVE ===== */
+        @media (max-width: 768px) {
+            .floating-element { display: none; }
+            .glow-orb { display: none; }
+            .particle { display: none; }
+        }
+
+        /* ===== SMOOTH SCROLL ===== */
+        html { scroll-behavior: smooth; }
+
+        /* ===== CUSTOM SCROLLBAR ===== */
+        ::-webkit-scrollbar { width: 6px; }
+        ::-webkit-scrollbar-track { background: #0f172a; }
+        ::-webkit-scrollbar-thumb { background: #334155; border-radius: 3px; }
+        ::-webkit-scrollbar-thumb:hover { background: #475569; }
+
+        /* ===== TOOLTIP ===== */
+        .tooltip {
+            position: relative;
+        }
+
+        .tooltip::after {
+            content: attr(data-tooltip);
+            position: absolute;
+            bottom: calc(100% + 8px);
+            left: 50%;
+            transform: translateX(-50%) translateY(5px);
+            background: #1e293b;
+            color: #e2e8f0;
+            padding: 6px 12px;
+            border-radius: 8px;
+            font-size: 0.7rem;
+            font-weight: 600;
+            white-space: nowrap;
+            opacity: 0;
+            pointer-events: none;
+            transition: all 0.3s ease;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        .tooltip:hover::after {
+            opacity: 1;
+            transform: translateX(-50%) translateY(0);
+        }
+    </style>
+</head>
+<body class="antialiased">
+
+    <!-- Background Decorations -->
+    <div class="glow-orb glow-orb-1"></div>
+    <div class="glow-orb glow-orb-2"></div>
+
+    <!-- Floating Elements -->
+    <div class="floating-element"><span class="icon">🍟</span></div>
+    <div class="floating-element"><span class="icon">🌶️</span></div>
+    <div class="floating-element"><span class="icon">🍟</span></div>
+    <div class="floating-element"><span class="icon">✨</span></div>
+    <div class="floating-element"><span class="icon">🔥</span></div>
+    <div class="floating-element"><span class="icon">🍟</span></div>
+
+    <!-- Particle Dots -->
+    <div class="particle" style="top:20%;left:10%;animation-delay:0s"></div>
+    <div class="particle" style="top:60%;left:90%;animation-delay:1s"></div>
+    <div class="particle" style="top:40%;left:50%;animation-delay:2s"></div>
+    <div class="particle" style="top:80%;left:25%;animation-delay:0.5s"></div>
+    <div class="particle" style="top:10%;left:75%;animation-delay:1.5s"></div>
+
+    <!-- Navbar -->
+    <nav class="fixed top-0 left-0 right-0 z-50 glass animate-nav">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="flex justify-between items-center h-20">
+                <div class="flex items-center space-x-2 md:space-x-3">
+                    <div class="w-9 h-9 md:w-10 md:h-10 bg-gradient-to-br from-orange-400 to-orange-600 rounded-xl flex items-center justify-center shadow-lg nav-logo">
+                        <i class="fas fa-fire text-white text-base md:text-lg"></i>
+                    </div>
+                    <span class="text-xl md:text-2xl font-extrabold tracking-tight text-white">PINOY<span class="text-orange-500">FRIES</span></span>
+                </div>
+                <div class="flex items-center space-x-4 md:space-x-8">
+                    <a href="index.html" class="nav-item text-xs md:text-sm font-bold text-gray-300 hover:text-white transition-colors duration-300 uppercase tracking-wider">Home</a>
+                    <a href="alcoholicbeer.html" class="nav-item text-xs md:text-sm font-bold text-gray-300 hover:text-white transition-colors duration-300 uppercase tracking-wider">Menu</a>
+                    <a href="cart.html" class="nav-item text-xs md:text-sm font-bold text-gray-300 hover:text-white transition-colors duration-300 uppercase tracking-wider">Cart</a>
+                </div>
+            </div>
+        </div>
+    </nav>
+
+    <main class="flex-grow flex items-center justify-center pt-28 md:pt-32 pb-8 md:pb-12 px-4">
+        <div class="max-w-5xl w-full main-card rounded-[2rem] md:rounded-[2.5rem] overflow-hidden flex flex-col md:flex-row animate-card">
+            
+            <!-- Left Branding Side -->
+            <div class="md:w-5/12 side-image relative p-8 md:p-12 flex flex-col justify-end min-h-[250px] md:min-h-full">
+                <div class="absolute inset-0 bg-gradient-to-t from-slate-950 via-slate-950/40 to-transparent md:bg-gradient-to-t md:from-slate-950 md:via-slate-950/20"></div>
+                <div class="relative z-10 brand-content">
+                    <div class="brand-badge">
+                        <span class="inline-block px-4 py-1.5 bg-gradient-to-r from-orange-400 to-orange-500 text-black text-[10px] md:text-[11px] font-black uppercase tracking-widest rounded-full mb-3 md:mb-4 shadow-lg shadow-orange-500/20">
+                            <i class="fas fa-bolt mr-1"></i> Express Delivery
+                        </span>
+                    </div>
+                    <h2 class="text-3xl md:text-4xl font-black text-white mb-2 md:mb-3 leading-tight">Fresh &<br><span class="text-orange-400">Crispy!</span></h2>
+                    <p class="text-gray-200 text-base md:text-lg font-medium leading-relaxed">Your gourmet fries are just a few details away from being dispatched.</p>
+                </div>
+            </div>
+
+            <!-- Right Form Side -->
+            <div class="md:w-7/12 p-6 sm:p-8 md:p-10 lg:p-14 bg-slate-900/30 relative">
+                <!-- Step Indicator -->
+                <div class="step-indicator">
+                    <div class="step">
+                        <div class="step-dot completed"><i class="fas fa-check" style="font-size:0.6rem"></i></div>
+                        <span class="step-label hidden md:inline">Cart</span>
+                    </div>
+                    <div class="step-line completed"></div>
+                    <div class="step">
+                        <div class="step-dot active">2</div>
+                        <span class="step-label active hidden md:inline">Shipping</span>
+                    </div>
+                    <div class="step-line"></div>
+                    <div class="step">
+                        <div class="step-dot upcoming">3</div>
+                        <span class="step-label hidden md:inline">Receipt</span>
+                    </div>
+                </div>
+
+                <div class="mb-8 md:mb-10 animate-title">
+                    <h1 class="text-3xl md:text-4xl font-black text-white mb-2 tracking-tight">Shipping <span class="text-orange-500">Info</span></h1>
+                    <div class="section-title">
+                        <p class="text-gray-400 font-medium text-sm md:text-base animate-subtitle">Please provide your delivery details below.</p>
+                    </div>
+                </div>
+
+                <div id="welcomeBanner" class="hidden welcome-banner p-4 md:p-5 rounded-2xl mb-6 md:mb-8 flex items-center space-x-3 md:space-x-4 animate-welcome">
+                    <div class="w-10 h-10 md:w-12 md:h-12 bg-gradient-to-br from-orange-400 to-orange-500 rounded-xl flex items-center justify-center flex-shrink-0 shadow-lg shadow-orange-500/20">
+                        <i class="fas fa-user-check text-black text-lg md:text-xl"></i>
+                    </div>
+                    <p id="welcomeBannerText" class="text-xs md:text-sm font-bold leading-snug text-white relative z-10"></p>
+                </div>
+
+                <form id="shipping-form" class="space-y-5 md:space-y-7">
+                    <!-- Date Field -->
+                    <div class="animate-field input-group">
+                        <label class="text-[10px] md:text-[11px] font-black text-gray-500 uppercase tracking-widest ml-4 md:ml-5 mb-1.5 block">Order Date</label>
+                        <div class="relative">
+                            <i class="fas fa-calendar-alt absolute left-4 md:left-5 top-1/2 -translate-y-1/2 text-gray-400 transition-colors duration-300 group-focus-within:text-orange-500"></i>
+                            <input type="text" id="date" readonly class="input-field w-full pl-12 md:pl-14 pr-4 md:pr-5 py-3.5 md:py-4.5 rounded-xl md:rounded-2xl font-bold text-sm md:text-base">
+                        </div>
+                    </div>
+
+                    <!-- Name Field -->
+                    <div class="animate-field input-group">
+                        <label class="text-[10px] md:text-[11px] font-black text-gray-500 uppercase tracking-widest ml-4 md:ml-5 mb-1.5 block">Full Name</label>
+                        <div class="relative">
+                            <i class="fas fa-user absolute left-4 md:left-5 top-1/2 -translate-y-1/2 text-gray-400 group-focus-within:text-orange-500 transition-colors duration-300"></i>
+                            <input type="text" id="name" placeholder="Juan Dela Cruz" required class="input-field w-full pl-12 md:pl-14 pr-4 md:pr-5 py-3.5 md:py-4.5 rounded-xl md:rounded-2xl font-bold text-sm md:text-base">
+                        </div>
+                    </div>
+
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-5 md:gap-6">
+                        <!-- Barangay Selection -->
+                        <div class="animate-field input-group">
+                            <label class="text-[10px] md:text-[11px] font-black text-gray-500 uppercase tracking-widest ml-4 md:ml-5 mb-1.5 block">Barangay</label>
+                            <div class="relative">
+                                <i class="fas fa-map-marker-alt absolute left-4 md:left-5 top-1/2 -translate-y-1/2 text-gray-400 group-focus-within:text-orange-500 transition-colors duration-300"></i>
+                                <select id="address" name="address" required class="input-field w-full pl-12 md:pl-14 pr-10 py-3.5 md:py-4.5 rounded-xl md:rounded-2xl font-bold text-sm md:text-base appearance-none cursor-pointer">
+                                    <option value="" disabled selected>Select Barangay</option>
+                                    <option value="Balubohan">Balubohan</option>
+                                    <option value="Birayan">Birayan</option>
+                                    <option value="Damasing">Damasing</option>
+                                    <option value="Mabunao">Mabunao</option>
+                                    <option value="East Poblacion">East Poblacion</option>
+                                    <option value="Mabuhay">Mabuhay</option>
+                                    <option value="La Esperanza">La Esperanza</option>
+                                    <option value="Nangca">Nangca</option>
+                                    <option value="Mitimos">Mitimos</option>
+                                    <option value="Nangca-an">Nangca-an</option>
+                                    <option value="Napilan">Napilan</option>
+                                    <option value="New Dapitan">New Dapitan</option>
+                                    <option value="North Mapang">North Mapang</option>
+                                    <option value="Nilabo">Nilabo</option>
+                                    <option value="Rizalina">Rizalina</option>
+                                    <option value="San Roque">San Roque</option>
+                                    <option value="Sipaon">Sipaon</option>
+                                    <option value="South Mapang">South Mapang</option>
+                                    <option value="Tolon">Tolon</option>
+                                    <option value="Sebaca">Sebaca</option>
+                                    <option value="West Poblacion">West Poblacion</option>
+                                </select>
+                                <i class="fas fa-chevron-down absolute right-4 md:right-5 top-1/2 -translate-y-1/2 text-gray-400 pointer-events-none transition-transform duration-300 group-focus-within:text-orange-500"></i>
+                            </div>
+                        </div>
+
+                        <!-- Phone Field -->
+                        <div class="animate-field input-group">
+                            <label class="text-[10px] md:text-[11px] font-black text-gray-500 uppercase tracking-widest ml-4 md:ml-5 mb-1.5 block">Phone Number</label>
+                            <div class="relative">
+                                <i class="fas fa-phone absolute left-4 md:left-5 top-1/2 -translate-y-1/2 text-gray-400 group-focus-within:text-orange-500 transition-colors duration-300"></i>
+                                <input type="tel" id="number" placeholder="09XX XXX XXXX" required class="input-field w-full pl-12 md:pl-14 pr-4 md:pr-5 py-3.5 md:py-4.5 rounded-xl md:rounded-2xl font-bold text-sm md:text-base">
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Security Badge -->
+                    <div class="security-badge">
+                        <i class="fas fa-shield-alt"></i>
+                        <span>Your information is secure & encrypted</span>
+                    </div>
+
+                    <button type="submit" class="btn-primary w-full py-4 md:py-5 rounded-xl md:rounded-2xl font-black text-base md:text-lg uppercase tracking-widest flex items-center justify-center space-x-3 group mt-6 shadow-xl shadow-orange-500/10 animate-submit cursor-pointer">
+                        <span>Confirm Order</span>
+                        <i class="fas fa-truck group-hover:translate-x-2 transition-transform duration-300"></i>
+                    </button>
+                </form>
+            </div>
+        </div>
+    </main>
+
+    <!-- Confirmation Modal -->
+    <div id="confirmation-overlay" class="hidden fixed inset-0 z-[100] flex items-center justify-center p-4 bg-slate-950/90 backdrop-blur-xl">
+        <div class="max-w-md w-full modal-card p-8 md:p-12 rounded-[2rem] md:rounded-[3rem] text-center shadow-2xl modal-enter">
+            <!-- Confetti Container -->
+            <div class="confetti-container" id="confetti-container"></div>
+
+            <!-- Animated Checkmark -->
+            <div class="checkmark-circle">
+                <svg viewBox="0 0 52 52">
+                    <circle class="circle" cx="26" cy="26" r="25" fill="none"/>
+                    <path class="check" d="M14.1 27.2l7.1 7.2 16.7-16.8"/>
+                </svg>
+            </div>
+
+            <h2 class="text-3xl md:text-4xl font-black text-white mb-2 md:mb-3 tracking-tight">Order <span class="text-green-400">Received!</span></h2>
+            <p class="text-gray-400 font-medium mb-8 md:mb-10 text-base md:text-lg">Your crispy Pinoy Fries are being prepared.</p>
+            
+            <div class="bg-slate-900/80 p-5 md:p-6 rounded-2xl space-y-4 mb-8 md:mb-10 text-sm md:text-base font-bold border border-slate-700/50">
+                <div class="flex items-center justify-center space-x-3 text-gray-200">
+                    <i class="fas fa-phone-alt text-orange-500"></i>
+                    <span>+63 912 345 6789</span>
+                </div>
+                <div class="flex items-center justify-center space-x-3 text-gray-200">
+                    <i class="fas fa-envelope text-orange-500"></i>
+                    <a href="mailto:support@pinoyfries.ph" class="hover:text-orange-500 underline transition-colors">support@pinoyfries.ph</a>
+                </div>
+            </div>
+
+            <button id="ok-button" class="btn-primary w-full py-4 md:py-5 rounded-xl md:rounded-2xl font-black text-lg md:text-xl uppercase tracking-widest cursor-pointer">
+                View Receipt <i class="fas fa-arrow-right ml-2"></i>
+            </button>
+        </div>
+    </div>
+
+    <!-- Loader -->
+    <div id="loading" class="hidden fixed inset-0 z-[200] flex items-center justify-center bg-slate-950/80 backdrop-blur-md">
+        <div class="loader-container">
+            <div class="loader-ring">
+                <div class="ring"></div>
+                <div class="ring"></div>
+                <div class="ring"></div>
+                <div class="fries-icon"><i class="fas fa-fire"></i></div>
+            </div>
+            <div class="loader-text">
+                <span class="text-white font-black tracking-[0.2em] uppercase text-xs md:text-sm">Processing Order</span>
+                <span class="dot"></span>
+                <span class="dot"></span>
+                <span class="dot"></span>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Set current date
+        document.getElementById('date').value = new Date().toLocaleDateString('en-PH', {
+            year: 'numeric', month: 'long', day: 'numeric'
+        });
+
+        // Ripple effect on buttons
+        document.querySelectorAll('.btn-primary').forEach(btn => {
+            btn.addEventListener('click', function(e) {
+                const rect = this.getBoundingClientRect();
+                const ripple = document.createElement('span');
+                ripple.className = 'ripple';
+                ripple.style.left = (e.clientX - rect.left) + 'px';
+                ripple.style.top = (e.clientY - rect.top) + 'px';
+                this.appendChild(ripple);
+                setTimeout(() => ripple.remove(), 600);
+            });
+        });
+
+        // Input focus animations - add subtle icon bounce
+        document.querySelectorAll('.input-field').forEach(input => {
+            input.addEventListener('focus', function() {
+                const icon = this.parentElement.querySelector('i');
+                if (icon) {
+                    icon.style.transform = 'translateY(-50%) scale(1.2)';
+                    icon.style.transition = 'all 0.3s cubic-bezier(0.34, 1.56, 0.64, 1)';
+                }
+            });
+            input.addEventListener('blur', function() {
+                const icon = this.parentElement.querySelector('i');
+                if (icon) {
+                    icon.style.transform = 'translateY(-50%) scale(1)';
+                }
+            });
+        });
+
+        // Prefill from logged-in user
+        (async function prefillFromLoggedInUser() {
+            const profile = await getCurrentProfile();
+            if (!profile) {
+                sessionStorage.setItem('redirectAfterLogin', 'shipping.html');
+                window.location.href = 'login.html';
+                return;
+            }
+            const nameInput = document.getElementById('name');
+            const numberInput = document.getElementById('number');
+            if (profile.name) { nameInput.value = profile.name; nameInput.readOnly = true; }
+            if (profile.phone) { numberInput.value = profile.phone; numberInput.readOnly = true; }
+            if (profile.name || profile.phone) {
+                const firstName = (profile.name || '').trim().split(' ')[0];
+                const banner = document.getElementById('welcomeBanner');
+                const bannerText = document.getElementById('welcomeBannerText');
+                bannerText.textContent = `Welcome back, ${firstName}! We've pre-filled your details for a faster checkout.`;
+                banner.classList.remove('hidden');
+            }
+        })();
+
+        // Confetti generation
+        function createConfetti() {
+            const container = document.getElementById('confetti-container');
+            const colors = ['#FF9F1C', '#E76F51', '#2EC4B6', '#FFBF69', '#4ade80', '#f472b6', '#818cf8', '#fbbf24'];
+            const shapes = ['circle', 'square'];
+            
+            for (let i = 0; i < 50; i++) {
+                const confetti = document.createElement('div');
+                confetti.className = 'confetti';
+                const color = colors[Math.floor(Math.random() * colors.length)];
+                const shape = shapes[Math.floor(Math.random() * shapes.length)];
+                const size = Math.random() * 8 + 4;
+                
+                confetti.style.left = Math.random() * 100 + '%';
+                confetti.style.width = size + 'px';
+                confetti.style.height = size + 'px';
+                confetti.style.backgroundColor = color;
+                confetti.style.borderRadius = shape === 'circle' ? '50%' : '2px';
+                confetti.style.animationDelay = (Math.random() * 1.5) + 's';
+                confetti.style.animationDuration = (Math.random() * 1.5 + 2) + 's';
+                
+                container.appendChild(confetti);
+                
+                // Trigger animation
+                setTimeout(() => confetti.classList.add('animate'), 100);
+            }
+        }
+
+        // Form submission
+        document.getElementById('shipping-form').addEventListener('submit', function(e) {
+            e.preventDefault();
+            document.getElementById('loading').classList.remove('hidden');
+            setTimeout(() => {
+                sessionStorage.setItem('customerDate', document.getElementById('date').value);
+                sessionStorage.setItem('customerName', document.getElementById('name').value);
+                sessionStorage.setItem('customerAddress', document.getElementById('address').value);
+                sessionStorage.setItem('customerNumber', document.getElementById('number').value);
+                document.getElementById('loading').classList.add('hidden');
+                document.getElementById('confirmation-overlay').classList.remove('hidden');
+                createConfetti();
+            }, 2000);
+        });
+
+        document.getElementById('ok-button').addEventListener('click', function() {
+            window.location.href = 'receipt.html';
+        });
+
+        // Close modal on overlay click
+        document.getElementById('confirmation-overlay').addEventListener('click', function(e) {
+            if (e.target === this) {
+                // Optional: allow closing modal by clicking outside
+            }
+        });
+
+        // Keyboard accessibility
+        document.addEventListener('keydown', function(e) {
+            if (e.key === 'Escape') {
+                const modal = document.getElementById('confirmation-overlay');
+                if (!modal.classList.contains('hidden')) {
+                    window.location.href = 'receipt.html';
+                }
+            }
+        });
+    </script>
+</body>
+</html>
